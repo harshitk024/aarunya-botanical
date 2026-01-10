@@ -1,5 +1,6 @@
 import React from "react";
 import { assets } from "../assets/assets";
+import { Mail, Instagram, MessageCircle,Facebook } from "lucide-react";
 
 const Footer = () => {
   return (
@@ -7,8 +8,7 @@ const Footer = () => {
       <div className="flex flex-col sm:grid grid-cols-[3fr_1fr_1fr] gap-14 my-10 mt-40 text-sm">
         {/* ------------ Left Section ------------ */}
         <div>
-          {/* <img className="mb-5 w-40" src={assets.logo} alt="" /> */}
-          <p className="mb-4">Aarunya Botanical</p>
+          <img className="w-40" src={assets.logo} alt="" />
           <p className="w-full md:w-2/3 text-gray-600 leading-6">
             Lorem Ipsum is simply dummy text of the printing and typesetting
             industry. Lorem Ipsum has been the industry's standard dummy text
@@ -31,9 +31,38 @@ const Footer = () => {
         {/* ------------ Right Section ------------ */}
         <div>
           <p className="text-xl font-medium mb-5">GET IN TOUCH</p>
-          <ul className="flex flex-col gap-2 text-gray-600">
-            <li>+250-784-652-570</li>
-            <li>elyseniyibizi502@gmail.com</li>
+          <ul className="flex gap-2 text-gray-600">
+            <li>
+              <a
+                href="mailto:aarunyabotanicals@gmail.com"
+                aria-label="Gmail"
+                className="text-gray-600 hover:text-red-500 transition transform hover:scale-110"
+              >
+                <Mail className="w-6 h-6 sm:w-7 sm:h-7" />
+              </a>{" "}
+            </li>
+            <li>
+              <a
+                href="https://www.instagram.com/aarunya_botanicals/"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Instagram"
+                className="text-gray-600 hover:text-pink-500 transition transform hover:scale-110"
+              >
+                <Instagram className="w-6 h-6 sm:w-7 sm:h-7" />
+              </a>
+            </li>
+            <li>
+              <a
+                href="https://www.facebook.com/aarunyabotanicals"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Instagram"
+                className="text-gray-600 hover:text-blue-500 transition transform hover:scale-110"
+              >
+                <Facebook className="w-6 h-6 sm:w-7 sm:h-7" />
+              </a>
+            </li>
           </ul>
         </div>
       </div>

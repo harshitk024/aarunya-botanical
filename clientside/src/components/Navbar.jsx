@@ -1,5 +1,6 @@
 import React, { useContext, useState } from "react";
 import { assets } from "../assets/assets";
+// import Logo from "../assets/logo_app.svg"
 import { NavLink, useNavigate } from "react-router-dom";
 import { AppContext } from "../context/AppContext";
 import { ShoppingCart } from "lucide-react";
@@ -10,7 +11,8 @@ const Navbar = () => {
   const { token, setToken, userData } = useContext(AppContext);
 
   const [showMenu, setShowMenu] = useState(false);
-  const cartCount = useSelector(state => state.cart.total)
+  const cartCount = useSelector(state => state.cart.cartItems).length
+
 
 
   const logout = () => {
@@ -19,20 +21,24 @@ const Navbar = () => {
   };
 
   return (
-    <div className="flex items-center justify-between text-sm py-4 mb-5 border-b border-b-gray-400">
-      {/* <img
+    <div className="flex items-center justify-between text-sm p-4 mb-5 border-b border-b-gray-400 shadow-lg">
+      <div className="p-5">
+      <img
         onClick={() => navigate("/")}
-        className="w-44 cursor-pointer"
+        className="cursor-pointer"
         src={assets.logo}
+        height={100}
+        width={100}
         alt=""
-      /> */}
-      <div>Aarunya Botanical</div>
+      />
+      </div>
+      <div className="flex justify-between gap-10">
       <ul className="hidden md:flex items-start gap-5 font-medium">
         <NavLink to="/">
           <li className="py-1">HOME</li>
           <hr className="border-none outline-none h-0.5 bg-primary w-3/5 m-auto hidden" />
         </NavLink>
-        <NavLink to="/doctors">
+        <NavLink to="/products">
           <li className="py-1">PRODUCTS</li>
           <hr className="border-none outline-none h-0.5 bg-primary w-3/5 m-auto hidden" />
         </NavLink>
@@ -40,10 +46,6 @@ const Navbar = () => {
           <li className="py-1">ABOUT</li>
           <hr className="border-none outline-none h-0.5 bg-primary w-3/5 m-auto hidden" />
         </NavLink>
-        {/* <NavLink to="/contact">
-          <li className="py-1">CONTACT</li>
-          <hr className="border-none outline-none h-0.5 bg-primary w-3/5 m-auto hidden" />
-        </NavLink> */}
       </ul>
       <div className="flex items-center gap-4">
         <ul className="hidden md:flex items-start gap-5 font-medium">
@@ -115,8 +117,8 @@ const Navbar = () => {
             <NavLink onClick={() => setShowMenu(false)} to="/">
               <p className="px-4 py-2 rounded inline-block">HOME</p>
             </NavLink>
-            <NavLink onClick={() => setShowMenu(false)} to="/doctors">
-              <p className="px-4 py-2 rounded inline-block">ALL DOCTORS</p>
+            <NavLink onClick={() => setShowMenu(false)} to="/products">
+              <p className="px-4 py-2 rounded inline-block">PRODUCTS</p>
             </NavLink>
             <NavLink onClick={() => setShowMenu(false)} to="/about">
               <p className="px-4 py-2 rounded inline-block">ABOUT</p>
@@ -126,6 +128,7 @@ const Navbar = () => {
             </NavLink>
           </ul>
         </div>
+      </div>
       </div>
     </div>
   );

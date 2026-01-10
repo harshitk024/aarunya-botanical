@@ -1,17 +1,22 @@
 import { PlusIcon, SquarePenIcon, XIcon } from 'lucide-react';
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import AddressModal from './AddressModal';
 import { useSelector } from 'react-redux';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router';
+import { useContext } from 'react';
+import { AppContext } from '../context/AppContext';
+import axios from 'axios';
 
 const OrderSummary = ({ totalPrice, items }) => {
 
-    const currency = '$';
+    const {userData,backendUrl,token} = useContext(AppContext)
+
+    const currency = '₹';
 
     const navigate = useNavigate()
+    const addressList = userData?.address
 
-    const addressList = useSelector(state => state.address.list);
 
     const [paymentMethod, setPaymentMethod] = useState('COD');
     const [selectedAddress, setSelectedAddress] = useState(null);
@@ -19,15 +24,45 @@ const OrderSummary = ({ totalPrice, items }) => {
     const [couponCodeInput, setCouponCodeInput] = useState('');
     const [coupon, setCoupon] = useState('');
 
+    useEffect(() => {
+
+        if(addressList.line1 == ""){
+            setSelectedAddress(false)
+        }else{
+            setSelectedAddress(addressList)
+        }
+    },[addressList])
+
+    if(!userData) return <div>Loading..</div>
+    
     const handleCouponCode = async (event) => {
         event.preventDefault();
         
     }
-
+    
     const handlePlaceOrder = async (e) => {
-        e.preventDefault();
-        navigate('/orders')
+
+        try {
+
+        const {data} = await axios.post(backendUrl + `/api/products/place-order`,{},{
+            headers: {Authorization: `Bearer ${token}`}
+        })
+
+        if(data.success){
+            toast.success("Order placed Successfully")
+            navigate('/orders')
+        }
+
+
+        } catch (error) {
+            console.log(error)
+        }
+
+
     }
+
+    if(!addressList) return <div>Loading...</div>
+    console.log("addressList: ",selectedAddress)
 
     return (
         <div className='w-full max-w-lg lg:max-w-[340px] bg-slate-50/30 border border-slate-200 text-slate-500 text-sm rounded-xl p-7'>
@@ -47,22 +82,10 @@ const OrderSummary = ({ totalPrice, items }) => {
                     selectedAddress ? (
                         <div className='flex gap-2 items-center'>
                             <p>{selectedAddress.name}, {selectedAddress.city}, {selectedAddress.state}, {selectedAddress.zip}</p>
-                            <SquarePenIcon onClick={() => setSelectedAddress(null)} className='cursor-pointer' size={18} />
+                            <SquarePenIcon onClick={() => setShowAddressModal(true)} className='cursor-pointer' size={18} />
                         </div>
                     ) : (
                         <div>
-                            {
-                                addressList.length > 0 && (
-                                    <select className='border border-slate-400 p-2 w-full my-3 outline-none rounded' onChange={(e) => setSelectedAddress(addressList[e.target.value])} >
-                                        <option value="">Select Address</option>
-                                        {
-                                            addressList.map((address, index) => (
-                                                <option key={index} value={index}>{address.name}, {address.city}, {address.state}, {address.zip}</option>
-                                            ))
-                                        }
-                                    </select>
-                                )
-                            }
                             <button className='flex items-center gap-1 text-slate-600 mt-1' onClick={() => setShowAddressModal(true)} >Add Address <PlusIcon size={18} /></button>
                         </div>
                     )
@@ -102,7 +125,7 @@ const OrderSummary = ({ totalPrice, items }) => {
             </div>
             <button onClick={e => toast.promise(handlePlaceOrder(e), { loading: 'placing Order...' })} className='w-full bg-slate-700 text-white py-2.5 rounded hover:bg-slate-900 active:scale-95 transition-all'>Place Order</button>
 
-            {showAddressModal && <AddressModal setShowAddressModal={setShowAddressModal} />}
+            {showAddressModal && <AddressModal setSelectedAddress={setSelectedAddress} setShowAddressModal={setShowAddressModal} existingAddress={selectedAddress} />}
 
         </div>
     )

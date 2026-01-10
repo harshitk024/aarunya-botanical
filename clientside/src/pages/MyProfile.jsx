@@ -136,7 +136,7 @@ const MyProfile = () => {
               </p>
             ) : (
               <p className="text-gray-500">
-                {userData.address.line1}
+                {`${userData.address.street}  ${userData.address.city} ${userData.address.state} ${userData.address.zip}`}
                 <br />
                 {userData.address.line2}
               </p>

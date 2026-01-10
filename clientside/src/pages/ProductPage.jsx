@@ -3,16 +3,18 @@ import ProductDetails from "../components/ProductDetails";
 import { useParams } from "react-router";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+import { useContext } from "react";
+import { AppContext } from "../context/AppContext";
 
 export default function Product() {
 
     const { productId } = useParams();
     const [product, setProduct] = useState();
-    const products = useSelector(state => state.product.list);
+    const {products} = useContext(AppContext)
 
 
     const fetchProduct = async () => {
-        const product = products.find((product) => product.id === Number(productId));
+        const product = products.find((product) => product.id === productId);
         setProduct(product);
 
     }
@@ -23,6 +25,7 @@ export default function Product() {
         }
         scrollTo(0, 0)
     }, [productId,products]);
+    console.log(product)
 
     return (
         <div className="mx-6">
@@ -30,7 +33,7 @@ export default function Product() {
 
                 {/* Breadcrums */}
                 <div className="  text-gray-600 text-sm mt-8 mb-5">
-                    Home / Products / {product?.category}
+                    Home / Products / {product?.type}
                 </div>
 
                 {/* Product Details */}

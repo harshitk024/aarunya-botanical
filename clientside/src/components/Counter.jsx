@@ -1,27 +1,45 @@
-import { addToCart, removeFromCart } from "../lib/features/cart/cartSlice";
+import {
+  addToCart,
+  decreaseQuantity,
+  deleteItemFromCart,
+} from "../lib/features/cart/cartSlice";
 import { useDispatch, useSelector } from "react-redux";
+import { useContext, useEffect } from "react";
+import { AppContext } from "../context/AppContext";
 
 const Counter = ({ productId }) => {
+  const cartItems = useSelector((state) => state.cart.cartItems);
 
-    const { cartItems } = useSelector(state => state.cart);
+  const product = cartItems.find((item) => item.productId === productId);
 
-    const dispatch = useDispatch();
+  if (!product) {
+    return null;
+  }
+  console.log("cartItems:  ", cartItems);
 
-    const addToCartHandler = () => {
-        dispatch(addToCart({ productId }))
-    }
+  console.log("Cart product: ", product);
 
-    const removeFromCartHandler = () => {
-        dispatch(removeFromCart({ productId }))
-    }
+  const dispatch = useDispatch();
 
-    return (
-        <div className="inline-flex items-center gap-1 sm:gap-3 px-3 py-1 rounded border border-slate-200 max-sm:text-sm text-slate-600">
-            <button onClick={removeFromCartHandler} className="p-1 select-none">-</button>
-            <p className="p-1">{cartItems[productId]}</p>
-            <button onClick={addToCartHandler} className="p-1 select-none">+</button>
-        </div>
-    )
-}
+  const addToCartHandler = () => {
+    dispatch(addToCart({ productId }));
+  };
 
-export default Counter
+  const removeFromCartHandler = () => {
+    dispatch(decreaseQuantity({ productId }));
+  };
+
+  return (
+    <div className="inline-flex items-center gap-1 sm:gap-3 px-3 py-1 rounded border border-slate-200 max-sm:text-sm text-slate-600">
+      <button onClick={removeFromCartHandler} className="p-1 select-none">
+        -
+      </button>
+      <p className="p-1">{product.quantity || 0}</p>
+      <button onClick={addToCartHandler} className="p-1 select-none">
+        +
+      </button>
+    </div>
+  );
+};
+
+export default Counter;

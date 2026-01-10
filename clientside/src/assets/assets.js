@@ -4,9 +4,9 @@ import group_profiles from './group_profiles.png'
 import profile_pic from './profile_pic.png'
 import contact_image from './contact_image.png'
 import about_image from './about_image.png'
-import logo from './logo.svg'
 import dropdown_icon from './dropdown_icon.svg'
 import menu_icon from './menu_icon.svg'
+import logo_app from "./logo_app.svg"
 import cross_icon from './cross_icon.png'
 import chats_icon from './chats_icon.svg'
 import verified_icon from './verified_icon.svg'
@@ -58,6 +58,11 @@ import { ClockFadingIcon, HeadsetIcon, SendIcon } from "lucide-react";
 import profile_pic1 from "./profile_pic1.jpg"
 import profile_pic2 from "./profile_pic2.jpg"
 import profile_pic3 from "./profile_pic3.jpg"
+import slideshow_1 from "./slideshow_1.jpg"
+import slideshow_2 from "./slideshow_2.jpg"
+import slideshow_3 from "./slideshow_3.jpg"
+import slideshow_4 from "./slideshow_4.jpg"
+import logo from "./aaryunya_logo.webp"
 
 
 export const assets = {
@@ -65,6 +70,7 @@ export const assets = {
     header_img,
     group_profiles,
     logo,
+    logo_app,
     chats_icon,
     verified_icon,
     info_icon,
@@ -82,6 +88,10 @@ export const assets = {
     hero_product_img1, hero_product_img2, gs_logo,
     product_img1, product_img2, product_img3, product_img4, product_img5, product_img6,
     product_img7, product_img8, product_img9, product_img10, product_img11, product_img12,
+    slideshow_1,
+    slideshow_2,
+    slideshow_3,
+    slideshow_4
 }
 
 export const specialityData = [

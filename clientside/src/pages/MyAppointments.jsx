@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { AppContext } from "../context/AppContext";
 import axios from "axios";
 import { toast } from "react-toastify";
-
+import JoinMeetingButton from "../components/JoinMeetingButton";
 const MyAppointments = () => {
   const { backendUrl, token, getDoctorsData } = useContext(AppContext);
 
@@ -32,8 +32,8 @@ const MyAppointments = () => {
 
   const getUserAppointments = async () => {
     try {
-      const { data } = await axios.get(backendUrl + "/api/user/appointments", {
-        headers: { token },
+      const { data } = await axios.get(backendUrl + "/api/appointments", {
+        headers: { Authorization: `Bearer ${token}` },
       });
 
       if (data.success) {
@@ -49,9 +49,9 @@ const MyAppointments = () => {
   const cancelAppointment = async (appointmentId) => {
     try {
       const { data } = await axios.post(
-        backendUrl + "/api/user/cancel-appointment",
+        backendUrl + "/api/appointments/cancel-appointment",
         { appointmentId },
-        { headers: { token } }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
       if (data.success) {
         toast.success(data.message);
@@ -107,6 +107,11 @@ const MyAppointments = () => {
             </div>
             <div></div>
             <div className="flex flex-col gap-2 justify-end">
+              {
+                !item.cancelled && !item.isCompleted && (
+                  <JoinMeetingButton appointmentId={item._id} />
+                )
+              }
               {!item.cancelled && !item.isCompleted && (
                 <button className="text-sm text-stone-500 text-center sm:min-w-48 py-2 border rounded hover:bg-primary hover:text-white transition-all duration-300">
                   Pay Online

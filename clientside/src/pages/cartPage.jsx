@@ -5,15 +5,17 @@ import { deleteItemFromCart } from "../lib/features/cart/cartSlice";
 import { Trash2Icon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useContext } from "react";
+import { AppContext } from "../context/AppContext";
 
 export default function Cart() {
 
-    const currency =  '$';
+    const currency =  '₹';
     
-    const { cartItems } = useSelector(state => state.cart);
-    console.log(cartItems)
-    const products = useSelector(state => state.product.list);
-    console.log(products)
+    const {cartItems}  = useSelector(state => state.cart);
+    console.log("cartItems: ",cartItems)
+    const {products} = useContext(AppContext)
+    console.log("Products:",products)
 
     const dispatch = useDispatch();
 
@@ -21,24 +23,29 @@ export default function Cart() {
     const [totalPrice, setTotalPrice] = useState(0);
 
     const createCartArray = () => {
-        setTotalPrice(0);
-        const cartArray = [];
-        for (const [key, value] of Object.entries(cartItems)) {
-            console.log(`key: ${key} Value: ${value}`)
-            const product = products.find(product => parseInt(product.id) === parseInt(key));
-            console.log(product)
-            if (product) {
-                cartArray.push({
-                    ...product,
-                    quantity: value,
-                });
-                setTotalPrice(prev => prev + product.price * value);
-            }
-        }
+  let total = 0;
 
-        setCartArray(cartArray);
-  
-    }
+  const cartArray = cartItems
+    .map((cartItem) => {
+      const product = products.find(
+        (product) => product.id === cartItem.productId
+      );
+
+      if (!product) return null;
+
+      total += product.price * cartItem.quantity;
+
+      return {
+        ...product,
+        quantity: cartItem.quantity,
+      };
+    })
+    .filter(Boolean); // remove nulls
+
+  setCartArray(cartArray);
+  setTotalPrice(total);
+};
+
 
     const handleDeleteItemFromCart = (productId) => {
         dispatch(deleteItemFromCart({ productId }))
@@ -51,7 +58,7 @@ export default function Cart() {
     }, [cartItems, products]);
 
 
-    return cartArray.length > 0 ? (
+    return cartItems.length > 0 ? (
         <div className="min-h-screen mx-6 text-slate-800">
 
             <div className="max-w-7xl mx-auto ">
@@ -71,11 +78,11 @@ export default function Cart() {
                         </thead>
                         <tbody>
                             {
-                                cartArray.map((item, index) => (
+                                cartArray.filter(item => item.quantity > 0).map((item, index) => (
                                     <tr key={index} className="space-x-2">
                                         <td className="flex gap-3 my-4">
                                             <div className="flex gap-3 items-center justify-center bg-slate-100 size-18 rounded-md">
-                                                <img src={item.images[0]} className="h-14 w-auto" alt="" width={45} height={45} />
+                                                <img src={item.images[0].imageUrl} className="h-14 w-auto" alt="" width={45} height={45} />
                                             </div>
                                             <div>
                                                 <p className="max-sm:text-sm">{item.name}</p>
@@ -84,7 +91,7 @@ export default function Cart() {
                                             </div>
                                         </td>
                                         <td className="text-center">
-                                            <Counter productId={item.id} />
+                                            {item.quantity > 0 && <Counter productId={item.id} />}
                                         </td>
                                         <td className="text-center">{currency}{(item.price * item.quantity).toLocaleString()}</td>
                                         <td className="text-center max-md:hidden">

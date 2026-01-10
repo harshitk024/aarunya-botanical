@@ -15,37 +15,35 @@ const Login = () => {
   const [name, setName] = useState("");
 
   const onSubmitHandler = async (event) => {
-    event.preventDefault();
+  event.preventDefault();
 
-    try {
-      if (state === "Sign Up") {
-        const { data } = await axios.post(backendUrl + "/api/user/register", {
-          name,
-          email,
-          password,
-        });
-        if (data.success) {
-          localStorage.setItem("token", data.token);
-          setToken(data.token);
-        } else {
-          toast.error(data.message);
-        }
-      } else {
-        const { data } = await axios.post(backendUrl + "/api/user/login", {
-          email,
-          password,
-        });
-        if (data.success) {
-          localStorage.setItem("token", data.token);
-          setToken(data.token);
-        } else {
-          toast.error(data.message);
-        }
-      }
-    } catch (error) {
-      toast.error(error.message);
+  try {
+    if (state === "Sign Up") {
+      const { data } = await axios.post(
+        backendUrl + "/api/auth/register",
+        { name, email, password }
+      );
+
+      toast.success(data.message || "Verification email sent");
+      setState("Login");
+      setName("");
+      setEmail("");
+      setPassword("");
+    } else {
+      const { data } = await axios.post(
+        backendUrl + "/api/auth/login",
+        { email, password }
+      );
+
+      localStorage.setItem("token", data.token);
+      setToken(data.token);
+      toast.success("Login successful");
     }
-  };
+  } catch (error) {
+    toast.error(error.response?.data?.message || "Something went wrong");
+  }
+};
+
 
   useEffect(() => {
     if (token) {

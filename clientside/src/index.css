@@ -20,3 +20,19 @@
     @apply text-white bg-primary;
   }
 }
+
+.slide-wrapper {
+  max-width: 420px;       /* controls card size */
+  margin: 0 auto;         /* centers it */
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+  background: #fff;
+}
+
+.slide-wrapper img {
+  width: 100%;
+  height: auto;           /* prevents stretching */
+  display: block;
+  object-fit: contain;    /* VERY IMPORTANT */
+}
