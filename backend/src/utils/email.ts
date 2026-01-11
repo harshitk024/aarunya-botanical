@@ -1,28 +1,16 @@
-import nodemailer from "nodemailer";
+import sgMail from "@sendgrid/mail";
 
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: process.env.EMAIL_USER as string,
-    pass: process.env.EMAIL_PASS as string,
-  },
-});
+sgMail.setApiKey(process.env.SENDGRID_API_KEY!);
 
-export const sendVerificationEmail = async (
-  email: string,
-  token: string
-) => {
+export async function sendVerificationEmail(email: string, token: string) {
+
+  console.log("Sending verification email.... to.. ",email)
   const verifyUrl = `${process.env.FRONTEND_URL}/verify-email?token=${token}`;
-
-  await transporter.sendMail({
-    from: `"Your App" <${process.env.EMAIL_USER}>`,
+  await sgMail.send({
     to: email,
+    from: "kharshit020@gmail.com",
     subject: "Verify your email",
-    html: `
-      <h3>Email Verification</h3>
-      <p>Please verify your email to continue:</p>
-      <a href="${verifyUrl}">Verify Email</a>
-      <p>This link expires in 1 hour.</p>
-    `,
+    html: `<p>Click <a href=${verifyUrl}>Verify</a></p>`,
   });
-};
+}
+
