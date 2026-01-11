@@ -89,6 +89,7 @@ model WeeklyAvailability {
   dayOfWeek Int     // 0–6
   startTime String  // "10:00"
   endTime   String  // "18:00"
+  isEnabled Boolean @default(true)
 
   doctor DoctorProfile @relation(fields: [doctorId], references: [id], onDelete: Cascade)
 

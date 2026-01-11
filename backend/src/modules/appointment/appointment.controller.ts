@@ -89,7 +89,7 @@ export const getAvailableSlots = async (req: any, res: any) => {
       where: {
         doctorId_dayOfWeek: {
           doctorId: doctor.doctorProfile.id,
-          dayOfWeek,
+          dayOfWeek,  
         },
       },
     });

@@ -1316,7 +1316,8 @@ export const WeeklyAvailabilityScalarFieldEnum = {
   doctorId: 'doctorId',
   dayOfWeek: 'dayOfWeek',
   startTime: 'startTime',
-  endTime: 'endTime'
+  endTime: 'endTime',
+  isEnabled: 'isEnabled'
 } as const
 
 export type WeeklyAvailabilityScalarFieldEnum = (typeof WeeklyAvailabilityScalarFieldEnum)[keyof typeof WeeklyAvailabilityScalarFieldEnum]

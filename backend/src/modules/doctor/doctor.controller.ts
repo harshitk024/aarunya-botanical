@@ -6,7 +6,7 @@ export const getDoctorAppointments = async (req: any, res: any) => {
   const appointments = await prisma.appointment.findMany({
     where: { doctorId },
     include: {
-      patient: { select: { name: true, email: true,image: true} },
+      patient: { select: { name: true, email: true, image: true } },
     },
     orderBy: { startTime: "asc" },
   });
@@ -86,7 +86,7 @@ export const getDoctorDashboard = async (req: any, res: any) => {
 
     const earnings =
       earningsAgg._sum.amount
-        ? earningsAgg._sum.amount/ 100
+        ? earningsAgg._sum.amount / 100
         : 0;
 
 
@@ -157,9 +157,22 @@ export const getDoctorProfile = async (req: any, res: any) => {
     const doctor = await prisma.user.findUnique({
       where: { id: userId },
       include: {
-        doctorProfile: true,
+        doctorProfile: {
+          include: {
+            availabilities: true,
+          },
+        },
       },
     });
+
+
+    if (!doctor) {
+      res.status.json({
+        success: false,
+        message: "Can't find doctor data"
+      })
+    }
+
 
     if (!doctor || !doctor.doctorProfile) {
       return res.status(404).json({
@@ -180,6 +193,15 @@ export const getDoctorProfile = async (req: any, res: any) => {
         fees: doctor.doctorProfile.fees,
         address: doctor.address,
         available: doctor.doctorProfile.isActive,
+        weeklyAvailability: doctor.doctorProfile.availabilities.map(
+          (slot) => ({
+            id: slot.id,
+            dayOfWeek: slot.dayOfWeek,
+            startTime: slot.startTime,
+            endTime: slot.endTime,
+            isEnabled: slot.isEnabled
+          })
+        )
       },
     });
   } catch (error) {
@@ -194,7 +216,7 @@ export const getDoctorProfile = async (req: any, res: any) => {
 export const updateDoctorProfile = async (req: any, res: any) => {
   try {
     const userId = (req as any).user?.userId
-    const { address, fees, available } = req.body;
+    const { address, fees, available,weeklyAvailability } = req.body;
 
     // Safety checks
     if (fees !== undefined && fees < 0) {
@@ -213,13 +235,40 @@ export const updateDoctorProfile = async (req: any, res: any) => {
     });
 
     // Update DoctorProfile (fees & availability)
-    await prisma.doctorProfile.update({
+    const doctor = await prisma.doctorProfile.update({
       where: { userId: userId },
       data: {
         fees: Number(fees),
         isActive: available,
       },
     });
+
+    if(!Array.isArray(weeklyAvailability)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid availability data"
+      })
+    }
+
+    const updatePromises = weeklyAvailability.map((slot) =>
+      prisma.weeklyAvailability.update({
+        where: {
+          doctorId_dayOfWeek: {
+            doctorId: doctor.id,
+            dayOfWeek: slot.dayOfWeek,
+          },
+        },
+        data: {
+          startTime: slot.startTime,
+          endTime: slot.endTime,
+          isEnabled: slot.isEnabled, 
+        },
+      })
+    );
+
+
+    await Promise.all(updatePromises);
+
 
     res.status(200).json({
       success: true,
