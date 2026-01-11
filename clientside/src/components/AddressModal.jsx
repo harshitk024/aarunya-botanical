@@ -1,7 +1,7 @@
 import { setAddress } from "../lib/features/address/addressSlice";
 import { XIcon } from "lucide-react";
 import { useContext, useState } from "react";
-import { toast } from "react-hot-toast";
+import { toast } from "react-toastify";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 import { AppContext } from "../context/AppContext";

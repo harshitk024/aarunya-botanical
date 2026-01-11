@@ -2,7 +2,7 @@ import { PlusIcon, SquarePenIcon, XIcon } from 'lucide-react';
 import React, { useEffect, useState } from 'react'
 import AddressModal from './AddressModal';
 import { useSelector } from 'react-redux';
-import toast from 'react-hot-toast';
+import {toast} from 'react-toastify';
 import { useNavigate } from 'react-router';
 import { useContext } from 'react';
 import { AppContext } from '../context/AppContext';
