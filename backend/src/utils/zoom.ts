@@ -19,6 +19,8 @@ export const getZoomAccessToken = async () => {
     }
   );
 
-  return res.data.access_token;
+  const resData = res.data as any
+
+  return resData.access_token;
 };
 

@@ -77,20 +77,22 @@ export const startZoomMeeting = async (req: any, res: any) => {
       }
     );
 
+    const zoomData = zoomRes.data as any
+
     // 6️⃣ Save meeting details
     await prisma.appointment.update({
       where: { id: appointmentId },
       data: {
-        zoomMeetingId: String(zoomRes.data.id),
-        zoomJoinUrl: zoomRes.data.join_url,
-        zoomStartUrl: zoomRes.data.start_url,
+        zoomMeetingId: String(zoomData.id),
+        zoomJoinUrl: zoomData.join_url,
+        zoomStartUrl: zoomData.start_url,
       },
     });
 
     // 7️⃣ Return host data
     return res.json({
-      meetingUrl: zoomRes.data.start_url,
-      meetingId: zoomRes.data.id,
+      meetingUrl: zoomData.start_url,
+      meetingId: zoomData.id,
       isHost: true,
     });
   } catch (error) {
