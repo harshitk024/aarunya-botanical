@@ -26,15 +26,23 @@ export const register = async (
     }
 
     const user = await registerUser({ name, email, password });
+    const userLogin = await loginUser({email,password})
+
+    const loginToken = signToken({
+      userId: userLogin.id,
+      role: userLogin.role,
+    });
+
 
     return res.status(201).json({
-      message: "Registration successful. Please verify your email.",
+      message: "Registration successful. Verification Email Sent",
       user: {
         id: user.id,
         name: user.name,
         email: user.email,
         role: user.role,
       },
+      token: loginToken
     });
   } catch (err) {
     const message =

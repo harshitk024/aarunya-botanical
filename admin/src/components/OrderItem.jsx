@@ -1,6 +1,6 @@
 import { useContext } from "react";
 import OrderStatusButton from "./OrderStatusButton";
-import toast from "react-hot-toast";
+import {toast} from "react-toastify";
 import axios from "axios";
 import { AdminContext } from "../context/AdminContext";
 

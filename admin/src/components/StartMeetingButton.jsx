@@ -1,20 +1,25 @@
 import axios from "axios";
 import { useContext } from "react";
 import { DoctorContext } from "../context/DoctorContext";
+import { useState } from "react";
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
+import { toast } from "react-toastify";
 const StartMeetingButton = ({appointmentId}) => {
 
     console.log(appointmentId)
 
   const {dToken} = useContext(DoctorContext)
+  const [loading,SetLoading] = useState(false)
 
   
   const startMeeting = async () => {
     try {
-
+      
+      toast.info("Starting Zoom Meeting, Please wait")
       const {data} = await axios.post(backendUrl + `/api/meeting/${appointmentId}/start-meeting`,{},{
         headers: {Authorization: `Bearer ${dToken}`}
       })
+      toast.success("Zoom meeting started!")
 
       // 🚀 This is what actually STARTS the Zoom meeting
       window.location.href = data.meetingUrl;

@@ -66,7 +66,7 @@ export const registerUser = async ({
     },
   });
 
-  await sendVerificationEmail(email, verificationToken);
+  sendVerificationEmail(email, verificationToken);
 
   return user;
 };

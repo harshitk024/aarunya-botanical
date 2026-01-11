@@ -9,7 +9,7 @@ const Login = () => {
   const navigate = useNavigate();
 
   const [state, setState] = useState("Sign Up");
-
+  const [loading,setLoading] = useState(false)
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
@@ -17,15 +17,26 @@ const Login = () => {
   const onSubmitHandler = async (event) => {
   event.preventDefault();
 
+  if (loading) return;
+
+  setLoading(true)
+
   try {
+
     if (state === "Sign Up") {
       const { data } = await axios.post(
         backendUrl + "/api/auth/register",
         { name, email, password }
       );
 
+      if(data){
+        console.log(data)
+      }
+
       toast.success(data.message || "Verification email sent");
-      setState("Login");
+      localStorage.setItem("token", data.token);
+      setToken(data.token)
+      navigate("/")
       setName("");
       setEmail("");
       setPassword("");
@@ -40,7 +51,10 @@ const Login = () => {
       toast.success("Login successful");
     }
   } catch (error) {
+    console.log(error)
     toast.error(error.response?.data?.message || "Something went wrong");
+  } finally {
+    setLoading(false)
   }
 };
 
@@ -98,7 +112,7 @@ const Login = () => {
           type="submit"
           className="bg-primary text-white w-full py-2 rounded-md text-base"
         >
-          {state === "Sign Up" ? "Create Account" : "Login"}
+          {loading ? "Please wait..." : state === "Sign Up" ? "Create Account" : "Login"}
         </button>
         {state === "Sign Up" ? (
           <p>

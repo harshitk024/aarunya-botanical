@@ -1,6 +1,5 @@
 import React, { useContext, useState } from "react";
 import { assets } from "../assets/assets";
-// import Logo from "../assets/logo_app.svg"
 import { NavLink, useNavigate } from "react-router-dom";
 import { AppContext } from "../context/AppContext";
 import { ShoppingCart } from "lucide-react";
@@ -14,15 +13,13 @@ const Navbar = () => {
   const cartCount = useSelector(state => state.cart.cartItems).length
 
 
-
   const logout = () => {
     setToken(false);
     localStorage.removeItem("token");
   };
 
   return (
-    <div className="flex items-center justify-between text-sm p-4 mb-5 border-b border-b-gray-400 shadow-lg">
-      <div className="p-5">
+    <div className="flex items-center justify-between text-sm p-6 mb-5 border-b border-b-gray-400">
       <img
         onClick={() => navigate("/")}
         className="cursor-pointer"
@@ -31,14 +28,12 @@ const Navbar = () => {
         width={100}
         alt=""
       />
-      </div>
-      <div className="flex justify-between gap-10">
       <ul className="hidden md:flex items-start gap-5 font-medium">
         <NavLink to="/">
           <li className="py-1">HOME</li>
           <hr className="border-none outline-none h-0.5 bg-primary w-3/5 m-auto hidden" />
         </NavLink>
-        <NavLink to="/products">
+        <NavLink to="/doctors">
           <li className="py-1">PRODUCTS</li>
           <hr className="border-none outline-none h-0.5 bg-primary w-3/5 m-auto hidden" />
         </NavLink>
@@ -55,7 +50,7 @@ const Navbar = () => {
           >
             <ShoppingCart size={20} />
             Cart
-            <button className="absolute flex justify-center items-center p-2 -top-1 left-3 text-[10px] text-white bg-slate-600 size-3.5 rounded-full">
+           <button className="absolute flex justify-center items-center p-2 -top-1 left-3 text-[10px] text-white bg-slate-600 size-3.5 rounded-full">
               {cartCount}
             </button>
           </NavLink>
@@ -77,12 +72,6 @@ const Navbar = () => {
                   className="hover:text-black cursor-pointer"
                 >
                   My Appointments
-                </p>
-                 <p
-                  onClick={() => navigate("/orders")}
-                  className="hover:text-black cursor-pointer"
-                >
-                  My Orders
                 </p>
                 <p onClick={logout} className="hover:text-black cursor-pointer">
                   Logout
@@ -119,22 +108,21 @@ const Navbar = () => {
               alt=""
             />
           </div>
-          <ul className="flex flex-col items-center gap-2 mt-5 px-5 text-lg font-medium">
-            <NavLink onClick={() => setShowMenu(false)} to="/">
-              <p className="px-4 py-2 rounded inline-block">HOME</p>
-            </NavLink>
-            <NavLink onClick={() => setShowMenu(false)} to="/products">
-              <p className="px-4 py-2 rounded inline-block">PRODUCTS</p>
-            </NavLink>
-            <NavLink onClick={() => setShowMenu(false)} to="/about">
-              <p className="px-4 py-2 rounded inline-block">ABOUT</p>
-            </NavLink>
-            <NavLink onClick={() => setShowMenu(false)} to="/contact">
-              <p className="px-4 py-2 rounded inline-block">CONTACT</p>
-            </NavLink>
-          </ul>
+            <ul className="flex flex-col items-center gap-2 mt-5 px-5 text-lg font-medium">
+                   <NavLink onClick={() => setShowMenu(false)} to="/">
+                     <p className="px-4 py-2 rounded inline-block">HOME</p>
+                   </NavLink>
+                   <NavLink onClick={() => setShowMenu(false)} to="/products">
+                     <p className="px-4 py-2 rounded inline-block">PRODUCTS</p>
+                   </NavLink>
+                   <NavLink onClick={() => setShowMenu(false)} to="/about">
+                     <p className="px-4 py-2 rounded inline-block">ABOUT</p>
+                   </NavLink>
+                   <NavLink onClick={() => setShowMenu(false)} to="/contact">
+                     <p className="px-4 py-2 rounded inline-block">CONTACT</p>
+                   </NavLink>
+                 </ul>
         </div>
-      </div>
       </div>
     </div>
   );
