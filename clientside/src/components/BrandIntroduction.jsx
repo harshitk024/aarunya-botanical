@@ -4,7 +4,7 @@ const BrandIntroduction = () => {
 
   const navigate = useNavigate()
   return (
-    <section className="w-full min-h-[90vh] flex items-center justify-center bg-white">
+    <section className="w-full min-h-[90vh] flex items-center justify-center bg-primary_lite">
       <div className="max-w-4xl px-5 text-center">
         {/* Top Label */}
         <div className="flex items-center justify-center gap-2 text-sm font-semibold tracking-[0.2em] text-green-700 mb-6">

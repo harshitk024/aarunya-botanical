@@ -70,9 +70,9 @@ const Footer = () => {
       {/* ------------ Copyright Text ------------ */}
       <div>
         <hr />
-        <p className="py-5 text-sm text-center">
+        {/* <p className="py-5 text-sm text-center">
           Copyright © 2024 ElyséeDev - All Right Reserved
-        </p>
+        </p> */}
       </div>
     </div>
   );

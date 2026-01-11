@@ -78,6 +78,12 @@ const Navbar = () => {
                 >
                   My Appointments
                 </p>
+                 <p
+                  onClick={() => navigate("/orders")}
+                  className="hover:text-black cursor-pointer"
+                >
+                  My Orders
+                </p>
                 <p onClick={logout} className="hover:text-black cursor-pointer">
                   Logout
                 </p>

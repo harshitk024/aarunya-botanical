@@ -63,6 +63,8 @@ const Appointment = () => {
           }
         );
 
+        console.log("slots data: ",data)
+
         if (!data.success || !data.workingHours) {
           slotsPerDay.push([]);
           continue;
@@ -159,7 +161,7 @@ const Appointment = () => {
       );
 
       if (data) {
-        toast.success("Appointment booked");
+        toast.success("Appointment Scheduled");
         navigate("/my-appointments");
       } else {
         toast.error(data.message);
