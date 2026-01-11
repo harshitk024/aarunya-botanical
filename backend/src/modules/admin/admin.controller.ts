@@ -1,6 +1,6 @@
 import prisma from "../../config/prisma";
 import bcrypt from "bcrypt"
-import { OrderStatus } from "../../../prisma/generated/enums";
+import { OrderStatus } from "@prisma/client";
 import { ORDER_STATUS_FLOW } from "../../utils/orderStatusFlow";
 
 export const getAllDoctors = async (_req: any, res: any) => {

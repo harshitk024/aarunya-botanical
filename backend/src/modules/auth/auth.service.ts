@@ -1,6 +1,6 @@
 import bcrypt from "bcrypt";
 import prisma from "../../config/prisma";
-import { Role } from "../../../prisma/generated/enums";
+import { Role } from "@prisma/client";
 import { generateEmailToken } from "../../utils/token";
 import { sendVerificationEmail } from "../../utils/email";
 

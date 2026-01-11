@@ -3,7 +3,7 @@ import cors from "cors";
 import authRoutes from "./modules/auth/auth.routes";
 import productRoutes from "./modules/product/product.routes"
 import cartRoutes from "./modules/cart/cart.routes"
-import orderRoutes from "./modules/order/order.routes"
+// import orderRoutes from "./modules/order/order.routes"
 import userRoutes from "./modules/user/user.routes"
 import adminRoutes from "./modules/admin/admin.routes"
 import doctorRoutes from "./modules/doctor/doctor.routes"
@@ -22,7 +22,7 @@ app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use("/api/products",productRoutes)
 app.use("/api/cart",cartRoutes)
-app.use("/api/orders",orderRoutes)
+// app.use("/api/orders",orderRoutes)
 app.use("/api/user",userRoutes)
 app.use("/api/admin",adminRoutes)
 app.use("/api/doctor",doctorRoutes)
