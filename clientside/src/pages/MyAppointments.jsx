@@ -23,11 +23,27 @@ const MyAppointments = () => {
     "Dec",
   ];
 
-  const slotDateFormat = (slotDate) => {
-    const dateArray = slotDate.split("_");
-    return (
-      dateArray[0] + " " + months[Number(dateArray[1])] + " " + dateArray[2]
-    );
+  const getUTCTime = (startTime) => {
+    const start = new Date(startTime);
+
+    return start.toLocaleTimeString("en-IN", {
+      timezone: "Asia/Kolkata",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    });
+  };
+
+  const slotDateFormat = (startTime) => {
+    const start = new Date(startTime);
+
+    const slotDate = start.toLocaleDateString("en-IN", {
+      timeZone: "Asia/Kolkata",
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
+    return slotDate;
   };
 
   const getUserAppointments = async () => {
@@ -102,16 +118,14 @@ const MyAppointments = () => {
                 <span className="text-sm text-neutral-700 font-medium">
                   Date & Time:
                 </span>{" "}
-                {slotDateFormat(item.slotDate)} | {item.slotTime}
+                {slotDateFormat(item.startTime)} | {getUTCTime(item.startTime)}
               </p>
             </div>
             <div></div>
             <div className="flex flex-col gap-2 justify-end">
-              {
-                !item.cancelled && !item.isCompleted && (
-                  <JoinMeetingButton appointmentId={item._id} />
-                )
-              }
+              {!item.cancelled && !item.isCompleted && (
+                <JoinMeetingButton appointmentId={item._id} />
+              )}
               {/* {!item.cancelled && !item.isCompleted && (
                 <button className="text-sm text-stone-500 text-center sm:min-w-48 py-2 border rounded hover:bg-primary hover:text-white transition-all duration-300">
                   Pay Online

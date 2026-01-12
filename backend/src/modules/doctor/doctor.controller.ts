@@ -294,7 +294,7 @@ export const getDoctorById = async(req: any,res: any) => {
 
      const doctor = await prisma.user.findUnique({
       where: {
-        id,
+        id: id,
         role: "DOCTOR"
       },
       include: {
@@ -302,7 +302,7 @@ export const getDoctorById = async(req: any,res: any) => {
       },
     });
 
-    console.log("FETCHED DOCTOR: ",doctor)
+    console.log("FETCHED DOCTOR: ", doctor)
 
     if(!doctor){
       return res.json({success: false,message: "can't find the doctor"})

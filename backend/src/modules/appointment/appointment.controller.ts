@@ -201,8 +201,8 @@ export const getUserAppointments = async (req: any, res: any) => {
 
       return {
         _id: apt.id,
-        slotDate,
-        slotTime,
+        startTime: apt.startTime,
+        endTime: apt.endTime,
         cancelled: apt.status === "CANCELLED",
         isCompleted: apt.status === "COMPLETED",
         docData: {
