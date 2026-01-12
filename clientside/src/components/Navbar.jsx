@@ -33,7 +33,7 @@ const Navbar = () => {
           <li className="py-1">HOME</li>
           <hr className="border-none outline-none h-0.5 bg-primary w-3/5 m-auto hidden" />
         </NavLink>
-        <NavLink to="/doctors">
+        <NavLink to="/products">
           <li className="py-1">PRODUCTS</li>
           <hr className="border-none outline-none h-0.5 bg-primary w-3/5 m-auto hidden" />
         </NavLink>
@@ -72,6 +72,12 @@ const Navbar = () => {
                   className="hover:text-black cursor-pointer"
                 >
                   My Appointments
+                </p>
+                                <p
+                  onClick={() => navigate("/orders")}
+                  className="hover:text-black cursor-pointer"
+                >
+                  My Orders
                 </p>
                 <p onClick={logout} className="hover:text-black cursor-pointer">
                   Logout

@@ -284,3 +284,49 @@ export const updateDoctorProfile = async (req: any, res: any) => {
 };
 
 
+export const getDoctorById = async(req: any,res: any) => {
+
+  try {
+
+    const {id}  = req.params
+
+    console.log("doctor Id: ",id)
+
+     const doctor = await prisma.user.findUnique({
+      where: {
+        id,
+        role: "DOCTOR"
+      },
+      include: {
+        doctorProfile: true
+      },
+    });
+
+    console.log("FETCHED DOCTOR: ",doctor)
+
+    if(!doctor){
+      return res.json({success: false,message: "can't find the doctor"})
+    }
+
+    const formattedDoctor = {
+      id: doctor.id,
+      name: doctor.name,
+      image: doctor.image,
+      speciality: doctor.doctorProfile?.speciality,
+      experience: doctor.doctorProfile?.experience,
+      fees: doctor.doctorProfile?.fees,
+      isActive: doctor.doctorProfile?.isActive,
+      about: doctor.doctorProfile?.about,
+      degree: doctor.doctorProfile?.degree
+    }
+
+    return res.json({success: true,doctor: formattedDoctor})
+
+  } catch (error ){
+    console.error("Doctor Fetching Error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch profile",
+    });
+  }
+}

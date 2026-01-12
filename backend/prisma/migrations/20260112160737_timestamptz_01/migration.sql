@@ -1,0 +1,6 @@
+-- AlterTable
+ALTER TABLE "Appointment" ALTER COLUMN "endTime" SET DATA TYPE TIMESTAMPTZ(6),
+ALTER COLUMN "startTime" SET DATA TYPE TIMESTAMPTZ(6);
+
+-- AlterTable
+ALTER TABLE "AvailabilityOverride" ALTER COLUMN "date" SET DATA TYPE TIMESTAMPTZ(6);

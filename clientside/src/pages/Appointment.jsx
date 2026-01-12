@@ -8,24 +8,40 @@ import axios from "axios";
 
 const Appointment = () => {
   const { docId } = useParams();
-  const { doctors, currencySymbol, backendUrl, token } = useContext(AppContext);
+  const { currencySymbol, backendUrl, token } = useContext(AppContext);
 
   const daysOfWeek = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
   const navigate = useNavigate();
 
   const [docInfo, setDocInfo] = useState(null);
   const [docSlots, setDocSlots] = useState([]);
+  const [loading,setLoading] = useState(false)
   const [slotIndex, setSlotIndex] = useState(0);
   const [slotTime, setSlotTime] = useState("");
   const [days, setDays] = useState([]);
 
-  /* -------------------- Fetch Doctor Info -------------------- */
-  useEffect(() => {
-    const info = doctors.find((doc) => doc.id === docId);
-    setDocInfo(info || null);
-  }, [doctors, docId]);
+ useEffect(() => {
+  const fetchDoctor = async () => {
+    try {
+      const {data}  = await axios.get(
+        `${backendUrl}/api/doctor/${docId}`
+      );
 
-  /* -------------------- Fetch Available Slots -------------------- */
+      if(data.success){
+        setDocInfo(data.doctor)
+      }
+
+      console.log(data)
+
+    } catch (err) {
+      console.log(err)
+      toast.error("Failed to load doctor");
+    }
+  };
+
+  if (docId) fetchDoctor();
+}, [docId]);
+
   const getAvailableSlots = async () => {
     try {
       setDocSlots([]);
@@ -34,8 +50,8 @@ const Appointment = () => {
       const today = new Date();
       const days = [];
 
+      const date = new Date(today);
       for (let i = 0; i < 7; i++) {
-        const date = new Date(today);
         date.setDate(today.getDate() + i);
 
         days.push({
@@ -48,32 +64,45 @@ const Appointment = () => {
       setDays(days);
 
       const slotsPerDay = [];
+      const requests = []
 
-      for (let i = 0; i < 7; i++) {
-        const date = new Date(today);
+      setLoading(true)
+
+
+      for (let i = 0;i < 7;i++){
+        const date = new Date(today)
+        date.setDate(today.getDate() + i)
+        const yyMmDd = date.toISOString().split("T")[0]
+
+        requests.push(axios.get(`${backendUrl}/api/appointments/${docId}/availability`,{
+          headers: {Authorization: `Bearer ${token}`},
+          params: {date: yyMmDd}
+        }))
+      }
+
+      console.time("weekly-slots")
+
+      const responses = await Promise.all(requests)
+
+      console.timeEnd("weekly-slots")
+
+      console.log(responses)
+
+
+      responses.forEach(({data},i) => {
+        if (!data.success || !data.workingHours){
+          slotsPerDay.push([])
+          return
+        }
+
+        const {startTime,endTime} = data.workingHours
+        const bookedSlots = data.bookedSlots || []
+
+        const date = new Date();
+        console.log("i: ",i)
         date.setDate(today.getDate() + i);
 
         const yyyyMmDd = date.toISOString().split("T")[0];
-
-        const { data } = await axios.get(
-          `${backendUrl}/api/appointments/${docId}/availability`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-            params: { date: yyyyMmDd },
-          }
-        );
-
-        console.log("slots data: ",data)
-
-        if (!data.success || !data.workingHours) {
-          slotsPerDay.push([]);
-          continue;
-        }
-
-
-        const { startTime, endTime } = data.workingHours;
-        const bookedSlots = data.bookedSlots || [];
-
         const daySlots = [];
         const current = new Date(`${yyyyMmDd}T${startTime}`);
         const end = new Date(`${yyyyMmDd}T${endTime}`);
@@ -111,8 +140,77 @@ const Appointment = () => {
         }
 
         slotsPerDay.push(daySlots);
-      }
+      })
 
+      // console.time("weekly-slots")
+      // for (let i = 0; i < 7; i++) {
+      //   const date = new Date(today);
+      //   date.setDate(today.getDate() + i);
+
+      //   const yyyyMmDd = date.toISOString().split("T")[0];
+
+
+      //   const { data } = await axios.get(
+      //     `${backendUrl}/api/appointments/${docId}/availability`,
+      //     {
+      //       headers: { Authorization: `Bearer ${token}` },
+      //       params: { date: yyyyMmDd },
+      //     }
+      //   );
+
+      
+
+      //   console.log("slots data: ",data)
+
+      //   if (!data.success || !data.workingHours) {
+      //     slotsPerDay.push([]);
+      //     continue;
+      //   }
+
+
+      //   const { startTime, endTime } = data.workingHours;
+      //   const bookedSlots = data.bookedSlots || [];
+
+      //   const daySlots = [];
+      //   const current = new Date(`${yyyyMmDd}T${startTime}`);
+      //   const end = new Date(`${yyyyMmDd}T${endTime}`);
+      //   const now = new Date();
+
+      //   while (current < end) {
+      //     const slotEnd = new Date(current);
+      //     slotEnd.setMinutes(slotEnd.getMinutes() + 30);
+
+      //     const isToday = current.toDateString() === now.toDateString();
+
+      //     // ❌ Hide past slots for today
+      //     if (isToday && current <= now) {
+      //       current.setMinutes(current.getMinutes() + 30);
+      //       continue;
+      //     }
+
+      //     const overlaps = bookedSlots.some(
+      //       (b) =>
+      //         new Date(b.startTime) < slotEnd && new Date(b.endTime) > current
+      //     );
+
+      //     if (!overlaps && slotEnd <= end) {
+      //       daySlots.push({
+      //         datetime: new Date(current),
+      //         time: current.toLocaleTimeString([], {
+      //           hour: "2-digit",
+      //           minute: "2-digit",
+      //           hour12: true,
+      //         }),
+      //       });
+      //     }
+
+      //     current.setMinutes(current.getMinutes() + 30);
+      //   }
+
+      //   slotsPerDay.push(daySlots);
+      // }
+      // console.timeEnd("weekly-slots")
+      setLoading(false)
       setDocSlots(slotsPerDay);
 
       // ✅ Auto-select first available day
@@ -131,6 +229,7 @@ const Appointment = () => {
 
   useEffect(() => {
     if (docInfo) {
+
       getAvailableSlots();
     }
   }, [docInfo]);
@@ -231,7 +330,6 @@ const Appointment = () => {
       <div className="sm:ml-60 sm:pl-4 mt-5 font-medium text-gray-700">
         <p>Booking slots</p>
 
-        {/* Day selector */}
         <div className="flex flex-wrap gap-3 mt-4">
           {docSlots.map((daySlots, index) => (
             <div
@@ -253,7 +351,7 @@ const Appointment = () => {
         <div className="mt-4">
           {noSlotsAvailable ? (
             <p className="text-sm text-gray-400">
-              {isToday
+              {loading ? "Loading Slots.. Please Wait" : isToday
                 ? "No slots available today"
                 : "No slots available for this day"}
             </p>

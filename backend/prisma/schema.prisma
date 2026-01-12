@@ -99,7 +99,7 @@ model WeeklyAvailability {
 model AvailabilityOverride {
   id        String   @id @default(uuid())
   doctorId  String
-  date      DateTime
+  date      DateTime   @db.Timestamptz(6)
   status    SlotStatus @default(BLOCKED)
 
   doctor DoctorProfile @relation(fields: [doctorId], references: [id], onDelete: Cascade)
@@ -114,8 +114,8 @@ model Appointment {
   patientId String
   doctorId  String
 
-  startTime DateTime
-  endTime   DateTime
+  startTime DateTime @db.Timestamptz(6)
+  endTime   DateTime @db.Timestamptz(6)
   status    AppointmentStatus @default(SCHEDULED)
 
   amount      Int

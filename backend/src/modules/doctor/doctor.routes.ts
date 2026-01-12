@@ -5,14 +5,17 @@ import {
   getPublicDoctors,
   getDoctorDashboard,
   getDoctorProfile,
-  updateDoctorProfile
+  updateDoctorProfile,
+  getDoctorById
 } from "./doctor.controller";
 import { authMiddleware } from "../../middlewares/auth.middleware";
 import { doctorMiddleware } from "../../middlewares/doctor.middleware";
 
+
 const router = Router();
 
 router.get("/public",getPublicDoctors)
+router.get("/:id",getDoctorById)
 
 router.use(authMiddleware,doctorMiddleware);
 
