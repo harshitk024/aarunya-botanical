@@ -17,75 +17,81 @@ const AddDoctor = () => {
   const [degree, SetDegree] = useState("");
   const [address1, SetAddress1] = useState("");
   const [address2, SetAddress2] = useState("");
+  const [availableFrom, setAvailableFrom] = useState("09:00");
+  const [availableTo, setAvailableTo] = useState("15:00");
 
   const { backendUrl, aToken } = useContext(AdminContext);
 
   const onSubmitHandler = async (event) => {
-  event.preventDefault();
+    event.preventDefault();
 
-  try {
-    if (docImg.length === 0) {
-      return toast.error("Image Not Selected");
-    }
-
-    toast.info("Uploading image...");
-
-    // 1️⃣ Upload image directly to Cloudinary
-    const imageUrl = await uploadToCloudinary(docImg[0], "doctors");
-
-    toast.success("Image uploaded");
-
-    // 2️⃣ Send JSON data to backend (NO FormData)
-    const payload = {
-      name,
-      email,
-      password,
-      experience: Number(experience.split(" ")[0]),
-      fees: Number(fees),
-      about,
-      speciality,
-      degree,
-      address: {
-        line1: address1,
-        line2: address2,
-      },
-      image: imageUrl,
-    };
-
-    console.log(payload)
-
-    const { data } = await axios.post(
-      backendUrl + "/api/admin/add-doctor",
-      payload,
-      {
-        headers: {
-          Authorization: `Bearer ${aToken}`,
-          "Content-Type": "application/json",
-        },
+    try {
+      if (docImg.length === 0) {
+        return toast.error("Image Not Selected");
       }
-    );
 
-    if (data?.success) {
-      toast.success("Doctor Added Successfully");
+      toast.info("Uploading image...");
 
-      // Reset form
-      SetDocImg([]);
-      SetName("");
-      SetEmail("");
-      SetPassword("");
-      SetFees("");
-      SetAbout("");
-      SetDegree("");
-      SetAddress1("");
-      SetAddress2("");
-    } else {
-      toast.error("Error occurred");
+      // 1️⃣ Upload image directly to Cloudinary
+      const imageUrl = await uploadToCloudinary(docImg[0], "doctors");
+
+      toast.success("Image uploaded");
+
+      // 2️⃣ Send JSON data to backend (NO FormData)
+      const payload = {
+        name,
+        email,
+        password,
+        experience: Number(experience.split(" ")[0]),
+        fees: Number(fees),
+        about,
+        speciality,
+        degree,
+        address: {
+          line1: address1,
+          line2: address2,
+        },
+        image: imageUrl,
+        availability: {
+          from: availableFrom,
+          to: availableTo
+        }
+      };
+
+      console.log(payload);
+
+      const { data } = await axios.post(
+        backendUrl + "/api/admin/add-doctor",
+        payload,
+        {
+          headers: {
+            Authorization: `Bearer ${aToken}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (data?.success) {
+        toast.success("Doctor Added Successfully");
+
+        // Reset form
+        SetDocImg([]);
+        SetName("");
+        SetEmail("");
+        SetPassword("");
+        SetFees("");
+        SetAbout("");
+        SetDegree("");
+        SetAddress1("");
+        SetAddress2("");
+      } else {
+        toast.error("Error occurred");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error(error.message || "Something went wrong");
     }
-  } catch (error) {
-    console.error(error);
-    toast.error(error.message || "Something went wrong");
-  }
-};
+  };
 
   return (
     <form onSubmit={onSubmitHandler} className="m-5 w-full">
@@ -95,16 +101,18 @@ const AddDoctor = () => {
           <label htmlFor="doc-img">
             <img
               className="w-16 bg-gray-100 rounded-full cursor-pointer"
-              src={docImg.length !== 0 ? URL.createObjectURL(docImg[0]) : assets.upload_area}
+              src={
+                docImg.length !== 0
+                  ? URL.createObjectURL(docImg[0])
+                  : assets.upload_area
+              }
               alt=""
             />
           </label>
           <input
             onChange={(e) =>
-                SetDocImg((prev) => [
-                  ...prev,
-                  ...Array.from(e.target.files),
-                ])}
+              SetDocImg((prev) => [...prev, ...Array.from(e.target.files)])
+            }
             type="file"
             id="doc-img"
             accept="image/*"
@@ -177,7 +185,41 @@ const AddDoctor = () => {
                 <option value="13 Year">13 Year</option>
                 <option value="14 Year">14 Year</option>
                 <option value="15 Year">15 Year</option>
+                <option value="16 Year">16 Year</option>
+                <option value="17 Year">17 Year</option>
+                <option value="18 Year">18 Year</option>
+                <option value="19 Year">19 Year</option>
+                <option value="20 Year">20 Year</option>
+                <option value="21 Year">20+ Year</option>
               </select>
+            </div>
+
+            <div className="flex-1 flex flex-col gap-1">
+              <p>Availability Hours</p>
+
+              <div className="flex gap-4">
+                <div className="flex flex-col gap-1 w-full">
+                  <label className="text-sm">From</label>
+                  <input
+                    type="time"
+                    value={availableFrom}
+                    onChange={(e) => setAvailableFrom(e.target.value)}
+                    className="border rounded px-3 py-2"
+                    required
+                  />
+                </div>
+
+                <div className="flex flex-col gap-1 w-full">
+                  <label className="text-sm">To</label>
+                  <input
+                    type="time"
+                    value={availableTo}
+                    onChange={(e) => setAvailableTo(e.target.value)}
+                    className="border rounded px-3 py-2"
+                    required
+                  />
+                </div>
+              </div>
             </div>
 
             <div className="flex-1 flex flex-col gap-1">

@@ -38,6 +38,7 @@ export const addDoctor = async (req: any, res: any) => {
       degree,
       image, // 👈 Cloudinary URL from frontend
       address,
+      availability
     } = req.body;
 
     // 1️⃣ Validate required fields
@@ -49,7 +50,8 @@ export const addDoctor = async (req: any, res: any) => {
       !fees ||
       !speciality ||
       !degree ||
-      !image
+      !image ||
+      !availability
     ) {
       return res.status(400).json({
         success: false,
@@ -94,6 +96,18 @@ export const addDoctor = async (req: any, res: any) => {
           fees: Number(fees),
           about,
         },
+      });
+
+      const weeklyAvailabilityData = Array.from({ length: 7 }, (_, day) => ({
+        doctorId: doctorProfile.id,
+        dayOfWeek: day, // 0 to 6
+        startTime: availability.from,
+        endTime: availability.to,
+        isEnabled: true,
+      }));
+
+      await tx.weeklyAvailability.createMany({
+        data: weeklyAvailabilityData,
       });
 
       return { user, doctorProfile };
@@ -234,42 +248,42 @@ export const getAllOrders = async (req: any, res: any) => {
 
   try {
 
-  const orders = await prisma.order.findMany({
-    orderBy: {
-      createdAt: "desc",
-    },
-    include: {
-      items: {
-        include: {
-          product: {
-            include: {
-              images: true,
+    const orders = await prisma.order.findMany({
+      orderBy: {
+        createdAt: "desc",
+      },
+      include: {
+        items: {
+          include: {
+            product: {
+              include: {
+                images: true,
+              },
             },
           },
         },
+        user: true
       },
-      user:true
-    },
-  })
+    })
 
 
-   return res.status(200).json({
+    return res.status(200).json({
       success: true,
       orders,
     });
-  
+
   } catch (error) {
-     console.error("GET ORDERS ERROR:", error);
+    console.error("GET ORDERS ERROR:", error);
     return res.status(500).json({
       success: false,
       message: "Failed to fetch orders",
     });
-     
+
   }
 }
 
 
-export const updateOrderStatus = async (req:any , res:any ) => {
+export const updateOrderStatus = async (req: any, res: any) => {
   const { orderId } = req.params;
   const { status } = req.body;
   const adminId = req.user?.userId;

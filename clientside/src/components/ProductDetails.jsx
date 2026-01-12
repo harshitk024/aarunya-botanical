@@ -6,13 +6,15 @@ import {
   CreditCardIcon,
   UserIcon,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import Counter from "./Counter";
 import { useDispatch, useSelector } from "react-redux";
+import { AppContext } from "../context/AppContext";
 
 const ProductDetails = ({ product }) => {
   const productId = product.id;
+  const {token} = useContext(AppContext)
   const currency = "₹";
 
   const dispatch = useDispatch();
@@ -27,7 +29,11 @@ const ProductDetails = ({ product }) => {
   const [mainImage, setMainImage] = useState(product.images[0].imageUrl);
 
   const addToCartHandler = () => {
-    dispatch(addToCart({ productId }));
+    if(!token){
+      navigate("/login")
+    } else {
+      dispatch(addToCart({ productId }));
+    }
   };
 
   const averageRating = 5;
