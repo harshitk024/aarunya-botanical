@@ -15,7 +15,7 @@ import { doctorMiddleware } from "../../middlewares/doctor.middleware";
 const router = Router();
 
 router.get("/public",getPublicDoctors)
-router.get("/:id",getDoctorById)
+router.get("/id/:id",getDoctorById)
 
 router.use(authMiddleware,doctorMiddleware);
 

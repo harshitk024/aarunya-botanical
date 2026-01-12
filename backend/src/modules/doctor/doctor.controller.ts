@@ -1,7 +1,11 @@
 import prisma from "../../config/prisma";
 
 export const getDoctorAppointments = async (req: any, res: any) => {
-  const doctorId = req.user.userId;
+  const doctorId = (req as any).user?.userId
+
+  console.log("doctorId: ",req.user.userId)
+
+  try {
 
   const appointments = await prisma.appointment.findMany({
     where: { doctorId },
@@ -14,6 +18,11 @@ export const getDoctorAppointments = async (req: any, res: any) => {
   console.log(appointments)
 
   res.json(appointments);
+
+}
+  catch (error) {
+    console.log(error)
+  }
 };
 
 export const completeAppointment = async (req: any, res: any) => {
@@ -301,8 +310,6 @@ export const getDoctorById = async(req: any,res: any) => {
         doctorProfile: true
       },
     });
-
-    console.log("FETCHED DOCTOR: ", doctor)
 
     if(!doctor){
       return res.json({success: false,message: "can't find the doctor"})

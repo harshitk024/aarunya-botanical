@@ -18,6 +18,8 @@ export const authMiddleware = (req: any, res: any, next:any) => {
     const token = authHeader.split(" ")[1];
     const decoded = verifyToken(token);
 
+    console.log("User decoded:  ",decoded)
+
     req.user = decoded;
     next();
   } catch {

@@ -20,15 +20,13 @@ const DoctorContextProvider = (props) => {
         backendUrl + "/api/doctor/appointments",
         { headers: {Authorization: `Bearer ${dToken}` } }
       );
-
-
-
-      console.log(data)
+      console.log("Appointment Data",data)
       if (data) {
         setAppointments(data);
         console.log(data);
       } else {
-        toast.error(data.message);
+      
+        toast.error(data);
       }
     } catch (error) {
       console.log(error);

@@ -24,7 +24,7 @@ const Appointment = () => {
   const fetchDoctor = async () => {
     try {
       const {data}  = await axios.get(
-        `${backendUrl}/api/doctor/${docId}`
+        `${backendUrl}/api/doctor/id/${docId}`
       );
 
       if(data.success){
