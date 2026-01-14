@@ -302,7 +302,7 @@ const Appointment = () => {
 
           <div className="flex items-center gap-2 text-sm mt-1 text-gray-600">
             <p>
-              {docInfo.degree} - {docInfo.speciality} {"(Ayu)"}
+              {docInfo.degree} - {docInfo.speciality}
             </p>
             <button className="py-0.5 px-2 border text-xs rounded-full">
               {docInfo.experience} Years

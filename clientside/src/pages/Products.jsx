@@ -32,7 +32,7 @@ const Products = () => {
 
   return (
     <div>
-      <p className="text-gray-600">Browse through different Beauty Products.</p>
+      <p className="text-gray-600">Browse through different Health Products.</p>
       <div className="flex flex-col sm:flex-row items-start gap-5 mt-5">
         <button
           className={`py-1 px-3 border rounded text-sm transition-all sm:hidden ${
