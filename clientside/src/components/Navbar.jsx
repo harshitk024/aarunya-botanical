@@ -41,6 +41,10 @@ const Navbar = () => {
           <li className="py-1">ABOUT</li>
           <hr className="border-none outline-none h-0.5 bg-primary w-3/5 m-auto hidden" />
         </NavLink>
+                <NavLink to="/contact">
+          <li className="py-1">CONTACT US</li>
+          <hr className="border-none outline-none h-0.5 bg-primary w-3/5 m-auto hidden" />
+        </NavLink>
       </ul>
       <div className="flex items-center gap-4">
         <ul className="hidden md:flex items-start gap-5 font-medium">

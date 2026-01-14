@@ -1,5 +1,4 @@
-import React from "react";
-import { assets } from "../assets/assets";
+  import { assets } from "../assets/assets";
 
 const About = () => {
   return (
@@ -18,25 +17,33 @@ const About = () => {
         />
         <div className="flex flex-col justify-center gap-6 md:w-2/4 text-sm text-gray-600">
           <p>
-            Welcome to Aarunya-Botanical, your trusted partner in managing your
-            healthcare needs conveniently and efficiently. At Aarunya-Botanical, we
-            understand the challenges individuals face when it comes to
-            scheduling doctor appointments and managing their health records.
+            Welcome to Aarunya Botanicals, a brand committed to supporting your
+            wellness journey through thoughtfully developed Ayurvedic solutions.
+            We understand that managing health requires consistency, trust, and
+            the right guidance, and our approach is rooted in making natural
+            healthcare more accessible and reliable.
           </p>
           <p>
-            Aarunya-Botanical is committed to excellence in healthcare technology. We
-            continuously strive to enhance our platform, integrating the latest
-            advancements to improve user experience and deliver superior
-            service. Whether you're booking your first appointment or managing
-            ongoing care, Aarunya-Botanical is here to support you every step of the
-            way.
+            At Aarunya Botanicals, we are driven by a deep respect for Ayurvedic
+            wisdom combined with careful research and responsible practices.
+            Every formulation is developed with a focus on quality, balance, and
+            long-term well-being. Our continuous efforts are directed toward
+            refining our processes, maintaining high standards, and ensuring
+            that our products meet the evolving needs of those seeking natural
+            health support.
+          </p>
+          <p>
+            Whether you are beginning your wellness journey or looking for
+            consistent, long-term care solutions, AArunya Botanicals is here to
+            support you with integrity and transparency at every step.
           </p>
           <b className="text-gray-800">Our Vision</b>
           <p>
-            Our vision at Aarunya-Botanical is to create a seamless healthcare
-            experience for every user. We aim to bridge the gap between patients
-            and healthcare providers, making it easier for you to access the
-            care you need, when you need it.
+            Our vision at Aarunya Botanicals is to create a seamless and
+            trustworthy wellness experience. We aim to bridge traditional
+            Ayurvedic knowledge with modern understanding, empowering
+            individuals to make informed health choices and embrace a more
+            balanced, mindful lifestyle.
           </p>
         </div>
       </div>

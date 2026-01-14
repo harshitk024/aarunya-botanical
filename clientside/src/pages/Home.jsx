@@ -1,5 +1,4 @@
-import React, { useEffect } from 'react'
-import Headers from '../components/Header'
+import { useEffect } from 'react'
 import BrandIntroduction from '../components/BrandIntroduction'
 import TopDoctors from '../components/TopDoctors'
 import Banner from '../components/Banner'

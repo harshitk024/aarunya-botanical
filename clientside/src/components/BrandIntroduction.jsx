@@ -1,8 +1,7 @@
 import { useNavigate } from "react-router";
 
 const BrandIntroduction = () => {
-
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   return (
     <section className="w-full min-h-[90vh] flex items-center justify-center bg-primary_lite">
       <div className="max-w-4xl px-5 text-center">
@@ -19,15 +18,17 @@ const BrandIntroduction = () => {
 
         {/* Description */}
         <p className="text-lg leading-relaxed text-green-700 mb-8">
-          Aarunya Botanicals is a modern botanical skincare brand rooted in the
-          richness of nature and supported by scientific innovation. We design
-          clean, safe, and effective formulations that bring visible results
-          without compromising skin health.
+          Aarunya Botanicals is an Ayurvedic wellness brand rooted in classical
+          Ayurvedic principles and guided by years of clinical experience and
+          research. We develop carefully formulated herbal products designed to
+          support overall health and metabolic balance, using time-tested
+          ingredients and responsible practices.
         </p>
 
         {/* Belief Line */}
         <p className="text-xl text-green-900 mb-10">
-          We believe true beauty begins with naturally healthy skin ✨
+          We believe true well-being begins with balance, awareness, and natural
+          support.
         </p>
 
         {/* Button */}

@@ -1,7 +1,6 @@
 import { createContext, useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
-import {doctorsDummy}  from "../assets/assets";
 
 export const AppContext = createContext();
 

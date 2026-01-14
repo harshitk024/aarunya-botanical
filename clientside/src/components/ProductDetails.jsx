@@ -77,7 +77,7 @@ const ProductDetails = ({ product }) => {
                 key={index}
                 size={14}
                 className="text-transparent mt-0.5"
-                fill={averageRating >= index + 1 ? "#00C950" : "#D1D5DB"}
+                fill={averageRating >= index + 1 ? "#d9d200" : "#D1D5DB"}
               />
             ))}
           <p className="text-sm ml-3 text-slate-500">10 Reviews</p>
@@ -123,7 +123,7 @@ const ProductDetails = ({ product }) => {
         <div className="flex flex-col gap-4 text-slate-500">
           <p className="flex gap-3">
             <EarthIcon className="text-slate-400" />
-            Free shipping worldwide
+            shipping worldwide
           </p>
           <p className="flex gap-3">
             <CreditCardIcon className="text-slate-400" />

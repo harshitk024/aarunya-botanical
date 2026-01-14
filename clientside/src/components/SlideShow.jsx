@@ -8,6 +8,7 @@ import slideshow1 from "../assets/slideshow_1.jpg";
 import slideshow2 from "../assets/slideshow_2.jpg";
 import slideshow3 from "../assets/slideshow_3.jpg";
 import slideshow4 from "../assets/slideshow_4.jpg";
+import slideshow5 from "../assets/slideshow_5.webp"
 
 const Carousel = () => {
   return (
@@ -44,6 +45,11 @@ const Carousel = () => {
           <SwiperSlide>
             <div className="slide-wrapper">
               <img src={slideshow4} alt="testimonial" />
+            </div>
+          </SwiperSlide>
+          <SwiperSlide>
+            <div className="slide-wrapper">
+              <img src={slideshow5} alt="testimonial" />
             </div>
           </SwiperSlide>
         </Swiper>

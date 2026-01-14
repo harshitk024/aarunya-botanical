@@ -50,7 +50,7 @@ const ProductCard = ({ product, onClick }) => {
                 key={index}
                 size={14}
                 className="mt-0.5"
-                fill={rating >= index + 1 ? "#00C950" : "#D1D5DB"}
+                fill={rating >= index + 1 ? "#d9d200" : "#D1D5DB"}
                 stroke="none"
               />
             ))}

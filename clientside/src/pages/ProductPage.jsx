@@ -1,8 +1,6 @@
-import ProductDescription from "../components/ProductDescription";
 import ProductDetails from "../components/ProductDetails";
 import { useParams } from "react-router";
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
 import { useContext } from "react";
 import { AppContext } from "../context/AppContext";
 

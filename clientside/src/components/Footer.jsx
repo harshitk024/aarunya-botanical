@@ -1,19 +1,18 @@
 import React from "react";
 import { assets } from "../assets/assets";
-import { Mail, Instagram, MessageCircle,Facebook } from "lucide-react";
+import { Mail, Instagram, MessageCircle, Facebook } from "lucide-react";
 
 const Footer = () => {
   return (
     <div className="md:mx-10">
       <div className="flex flex-col sm:grid grid-cols-[3fr_1fr_1fr] gap-14 my-10 mt-40 text-sm">
         {/* ------------ Left Section ------------ */}
-        <div>
+        <div className="flex flex-col gap-3">
           <img className="w-40" src={assets.logo} alt="" />
           <p className="w-full md:w-2/3 text-gray-600 leading-6">
-            Lorem Ipsum is simply dummy text of the printing and typesetting
-            industry. Lorem Ipsum has been the industry's standard dummy text
-            ever since the 1500s, when an unknown printer took a galley of type
-            and scrambled it to make a type specimen book.
+            Aarunya Botanicals is dedicated to creating thoughtfully developed
+            Ayurvedic formulations that support wellness through tradition,
+            research, and responsible care.
           </p>
         </div>
 
@@ -24,7 +23,6 @@ const Footer = () => {
             <li>Home</li>
             <li>About us</li>
             <li>Contact us</li>
-            <li>Privacy policy</li>
           </ul>
         </div>
 
