@@ -24,8 +24,8 @@ const Navbar = () => {
         onClick={() => navigate("/")}
         className="cursor-pointer"
         src={assets.logo}
-        height={100}
-        width={100}
+        height={150}
+        width={150}
         alt=""
       />
       <ul className="hidden md:flex items-start gap-5 font-medium">

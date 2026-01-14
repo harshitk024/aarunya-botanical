@@ -286,9 +286,9 @@ const Appointment = () => {
     <div>
       {/* -------------------- Doctor Details -------------------- */}
       <div className="flex flex-col sm:flex-row gap-4">
-        <div>
+        <div className="flex justify-center">
           <img
-            className="bg-primary w-full max-h-60 sm:max-w-72 rounded-lg"
+            className="bg-primary w-60 max-h-30 sm:w-50 sm:h-50 rounded-lg"
             src={docInfo.image}
             alt=""
           />
