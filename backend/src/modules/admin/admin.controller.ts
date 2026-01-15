@@ -59,7 +59,6 @@ export const addDoctor = async (req: any, res: any) => {
       });
     }
 
-    // 2️⃣ Check existing user
     const existingUser = await prisma.user.findUnique({
       where: { email },
     });
@@ -71,10 +70,8 @@ export const addDoctor = async (req: any, res: any) => {
       });
     }
 
-    // 3️⃣ Hash password
     const hashedPassword = await bcrypt.hash(password, 8);
 
-    // 4️⃣ DB transaction
     const doctor = await prisma.$transaction(async (tx) => {
       const user = await tx.user.create({
         data: {
@@ -82,8 +79,8 @@ export const addDoctor = async (req: any, res: any) => {
           email,
           password: hashedPassword,
           role: "DOCTOR",
-          image, // 👈 save Cloudinary URL
-          address, // optional
+          image, 
+          address, 
         },
       });
 

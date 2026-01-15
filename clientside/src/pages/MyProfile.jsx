@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import { useContext, useState } from "react";
 import { AppContext } from "../context/AppContext";
 import { assets } from "../assets/assets";
 import axios from "axios";
@@ -19,18 +19,17 @@ const MyProfile = () => {
       formData.append("phone", userData.phone);
       formData.append("address", JSON.stringify(userData.address));
       formData.append("gender", userData.gender);
-      formData.append("dob", userData.dob);
 
       image && formData.append("image", image);
 
-      const { data } = await axios.post(
+      const { data } = await axios.patch(
         backendUrl + "/api/user/update-profile",
         formData,
-        { headers: { token } }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
 
       if (data.success) {
-        toast.success(data.message);
+        toast.success("Profile Updated");
         await loadUserProfileData();
         setIsEdit(false);
         setImage(false);
@@ -161,7 +160,7 @@ const MyProfile = () => {
             ) : (
               <p className="text-gray-400">{userData.gender}</p>
             )}
-            <p className="font-medium">Birthday:</p>
+            {/* <p className="font-medium">Birthday:</p>
             {isEdit ? (
               <input
                 className="max-w-28 bg-gray-100"
@@ -173,7 +172,7 @@ const MyProfile = () => {
               />
             ) : (
               <p className="text-gray-400">{userData.dob}</p>
-            )}
+            )} */}
           </div>
         </div>
 

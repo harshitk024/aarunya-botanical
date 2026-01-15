@@ -1,15 +1,12 @@
 import Title from './Title'
 import ProductCard from './ProductCard'
-import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router'
 import { useContext } from 'react'
 import { AppContext } from '../context/AppContext'
 const LatestProducts = () => {
 
     const displayQuantity = 4
-    // const products = useSelector(state => state.product.list)
     const navigate = useNavigate()
-
     const {products} = useContext(AppContext)
 
     const handleClick = (id) => {

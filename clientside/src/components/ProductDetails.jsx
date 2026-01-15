@@ -39,7 +39,7 @@ const ProductDetails = ({ product }) => {
   const averageRating = 5;
 
   return (
-    <div className="flex max-lg:flex-col gap-12">
+    <div className="flex mt-10 max-lg:flex-col gap-12">
       <div className="flex max-sm:flex-col-reverse gap-3">
         <div className="flex sm:flex-col gap-3">
           {product.images.map((image, index) => (

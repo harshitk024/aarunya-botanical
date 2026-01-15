@@ -15,7 +15,8 @@ import verified_icon from "./verified_icon.svg"
 import about_image from "./about_image.png"
 import dropdown_icon from "./dropdown_icon.svg"
 import upload_icon from "./upload_icon.png"
-
+import slideshow_vid1 from "./testimonial_vid_1.mp4"
+import slideshow_vid2 from "./testimonial_vid_2.mp4"
 export const assets = {
     logo,
     logo_app,
@@ -24,6 +25,8 @@ export const assets = {
     slideshow_3,
     slideshow_4,
     slideshow_5,
+    slideshow_vid1,
+    slideshow_vid2,
     cross_icon,
     menu_icon,
     contact_image,

@@ -8,7 +8,6 @@ const Navbar = () => {
   const navigate = useNavigate();
 
   const { token, setToken, userData } = useContext(AppContext);
-
   const [showMenu, setShowMenu] = useState(false);
   const cartCount = useSelector(state => state.cart.cartItems).length
 

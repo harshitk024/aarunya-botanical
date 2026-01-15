@@ -313,7 +313,7 @@ const Appointment = () => {
             <p className="text-sm font-medium text-gray-600 flex gap-1">
               About <img src={assets.info_icon} alt="" />
             </p>
-            <p className="text-sm text-gray-500 mt-1">{docInfo.about}</p>
+            <p className="text-md text-gray-500 mt-1">{docInfo.about}</p>
           </div>
 
           <p className="text-gray-500 font-medium mt-4">

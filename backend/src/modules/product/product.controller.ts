@@ -35,7 +35,7 @@ export const createProduct = async (req: Request, res: Response) => {
           {
             folder: "products",
             resource_type: "image",
-            timeout: 120000, // 2 minutes
+            timeout: 120000, 
           },
           (error, result) => {
             if (error) return reject(error);

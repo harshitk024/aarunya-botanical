@@ -1,10 +1,11 @@
 import { Request, Response } from "express";
 import prisma from "../../config/prisma";
-
+import cloudinary from "../../config/cloudinary";
+import streamifier from "streamifier"
 export const getProfile = async (req: Request, res: Response) => {
   try {
 
-    const userId = (req as any).user?.userId 
+    const userId = (req as any).user?.userId
 
     console.log(userId)
 
@@ -50,9 +51,68 @@ export const getProfile = async (req: Request, res: Response) => {
   }
 };
 
+export const updateProfile = async (req: any, res: any) => {
+
+  try {
+    const userId = req.user.userId
+
+    const { name, phone, gender, dob, address } = req.body;
+    const files = req.files as Express.Multer.File[];
+
+
+    const updateData = {}
+
+    if (name) updateData['name'] = name;
+    if (phone) updateData['phone'] = phone;
+    if (gender) updateData['gender'] = gender;
+    if (dob) updateData['dob'] = new Date(dob);
+
+    if (address) {
+      updateData['address'] = JSON.parse(address);
+    }
+
+
+    const uploadToCloudinary = (file: Express.Multer.File) =>
+      new Promise<string>((resolve, reject) => {
+        const uploadStream = cloudinary.uploader.upload_stream(
+          {
+            folder: "users",
+            resource_type: "image",
+            timeout: 120000,
+          },
+          (error, result) => {
+            if (error) return reject(error);
+            resolve(result!.secure_url);
+          }
+        );
+
+        streamifier.createReadStream(file.buffer).pipe(uploadStream);
+      });
+
+    const imageUrls = await Promise.all(
+      files.map((file) => uploadToCloudinary(file))
+    );
+
+
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: { ...updateData, image: imageUrls[0] }
+    })
+    res.json({
+      success: true,
+      user: updatedUser
+    })
+
+  } catch (error) {
+    console.error(error)
+    res.status(500).json({ success: false, message: "Profile Update Failed" })
+  }
+
+}
+
 export const getCartItems = async (req: any, res: any) => {
   try {
-    const userId = (req as any).user?.userId 
+    const userId = (req as any).user?.userId
 
     const cartItems = await prisma.cartItem.findMany({
       where: {
@@ -99,9 +159,9 @@ export const getCartItems = async (req: any, res: any) => {
 };
 
 
-export const saveUserAddress = async (req: any, res:any) => {
+export const saveUserAddress = async (req: any, res: any) => {
   try {
-    const userId = (req as any).user?.userId 
+    const userId = (req as any).user?.userId
 
     const {
       name,
@@ -154,7 +214,7 @@ export const saveUserAddress = async (req: any, res:any) => {
   }
 };
 
-export const getUserAddress = async (req:any, res:any) => {
+export const getUserAddress = async (req: any, res: any) => {
   const user = await prisma.user.findUnique({
     where: { id: req.user.id },
     select: { address: true },

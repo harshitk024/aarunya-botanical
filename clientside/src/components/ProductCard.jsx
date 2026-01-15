@@ -15,7 +15,6 @@ const ProductCard = ({ product, onClick }) => {
         flex flex-col
       "
     >
-      {/* Image wrapper */}
       <div
         className="
           bg-[#F5F5F5]
@@ -37,7 +36,6 @@ const ProductCard = ({ product, onClick }) => {
         />
       </div>
 
-      {/* Content */}
       <div className="mt-4 flex justify-between gap-3 text-slate-800">
         <div className="min-w-0">
           <p className="text-base sm:text-lg font-medium truncate">

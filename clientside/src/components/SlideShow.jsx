@@ -1,81 +1,152 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
-import "swiper/css/navigation";
 import "swiper/css/pagination";
-import { Navigation, Pagination, Autoplay } from "swiper/modules";
+import { Pagination, Autoplay } from "swiper/modules";
+
 import slideshow1 from "../assets/slideshow_1.jpg";
 import slideshow2 from "../assets/slideshow_2.jpg";
 import slideshow3 from "../assets/slideshow_3.jpg";
 import slideshow4 from "../assets/slideshow_4.jpg";
-import slideshow5 from "../assets/slideshow_5.webp"
+import slideshow5 from "../assets/slideshow_5.webp";
+import slideshow_vid1 from "../assets/testimonial_vid_1.mp4";
+import slideshow_vid2 from "../assets/testimonial_vid_2.mp4";
+import Title from "./Title";
+import { useRef } from "react";
 
 const Carousel = () => {
+  const videoRefs = useRef([]);
+  const sectionRef = useRef(null);
+  const swiperRef = useRef(null);
+
+  const videos = [slideshow_vid1, slideshow_vid2];
+
+  useEffect(() => {
+    const handleFullScreenChange = () => {
+      const fullscreenEl = document.fullscreenElement;
+
+      videoRefs.current.forEach((video) => {
+        if (!video) return;
+
+        if (video === fullscreenEl) {
+          video.style.objectFit = "contain";
+        } else {
+          video.style.objectFit = "cover";
+        }
+      });
+    };
+
+    document.addEventListener("fullscreenchange", handleFullScreenChange);
+
+    return () => {
+      document.removeEventListener("fullscreenchange", handleFullScreenChange);
+    };
+  }, []);
+
+  useEffect(() => {
+    const sectionEl = sectionRef.current;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!swiperRef.current) return;
+
+        const swiper = swiperRef.current;
+        const activeIndex = swiper.activeIndex;
+        const activeVideo = videoRefs.current[activeIndex];
+
+        if (entry.isIntersecting && activeVideo) {
+          activeVideo.play().catch(() => {});
+        } else {
+          videoRefs.current.forEach((v) => v && v.pause());
+        }
+      },
+      {
+        threshold: 0.6,
+      }
+    );
+
+    if (sectionEl) observer.observe(sectionEl);
+    return () => observer.disconnect();
+  }, []);
+
   return (
-    <div className="flex flex-col">
-      <h1 className="self-center font-medium text-2xl">What our customer says</h1>
-      <div style={{ position: "relative" }}>
-        <Swiper
-          modules={[Navigation, Pagination, Autoplay]}
-          spaceBetween={50}
-          slidesPerView={1}
-          pagination={{ clickable: true }}
-          style={{
-            width: "100%",
-            padding: "40px 0",
-          }}
-          autoplay={{ delay: 5000 }}
-          loop={true}
-        >
-          <SwiperSlide>
-            <div className="slide-wrapper">
-              <img src={slideshow1} alt="testimonial" />
-            </div>
-          </SwiperSlide>
-          <SwiperSlide>
-            <div className="slide-wrapper">
-              <img src={slideshow2} alt="testimonial" />
-            </div>
-          </SwiperSlide>
-          <SwiperSlide>
-            <div className="slide-wrapper">
-              <img src={slideshow3} alt="testimonial" />
-            </div>
-          </SwiperSlide>
-          <SwiperSlide>
-            <div className="slide-wrapper">
-              <img src={slideshow4} alt="testimonial" />
-            </div>
-          </SwiperSlide>
-          <SwiperSlide>
-            <div className="slide-wrapper">
-              <img src={slideshow5} alt="testimonial" />
-            </div>
-          </SwiperSlide>
-        </Swiper>
+    <section className="max-w-7xl mx-auto px-4 py-16" ref={sectionRef}>
+      <Title title={"What our customer says"} />
 
+      <div className="grid grid-cols-1 md:grid-cols-[3fr_7fr] gap-10 items-stretch mt-10">
+        {/* VIDEO SLIDER */}
+        <div className="rounded-2xl overflow-hidden shadow-lg h-[620px] bg-black">
+          <Swiper
+            modules={[Pagination]}
+            slidesPerView={1}
+            pagination={{ clickable: true }}
+            onSwiper={(swiper) => (swiperRef.current = swiper)}
+            onSlideChange={(swiper) => {
+              // 1️⃣ Stop & reset all videos
+              videoRefs.current.forEach((v) => {
+                if (!v) return;
+                v.pause();
+                v.currentTime = 0;
+              });
 
-        {/* <div style={{
-          position: 'absolute',
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          alignItems: "center",
-          padding: "2rem",
-          transform: 'translate(-50%, -50%)',
-          textAlign: 'center',
-          zIndex: 2,
-        }} className='slide-info'>
-        <h2 id = "slide-header" style={{fontFamily: "Anton SC"}}>Welcome to Gozai<span style={{color: "lightgreen"}}>Store</span></h2>
-        <div id = "slide-description">
-         Discover a world of incredible products, all handpicked for quality and style, right here at Gozaistore. We bring you the best in modern essentials, from the latest tech gadgets to chic home decor, stylish fashion, and unique finds—all delivered straight to your door with just a click.
+              const index = swiper.realIndex;
+              const activeVideo = videoRefs.current[index];
+
+              if (activeVideo) {
+                setTimeout(() => {
+                  activeVideo.muted = true; 
+                  activeVideo.play().catch(() => {});
+                }, 100); 
+              }
+            }}
+            loop={true}
+            className="h-full"
+          >
+            {videos.map((video, index) => (
+              <SwiperSlide key={index}>
+                <video
+                  ref={(el) => (videoRefs.current[index] = el)}
+                  src={video}
+                  controls
+                  muted
+                  preload="metadata"
+                  playsInline
+                  onEnded={() => {
+                    swiperRef.current.slideNext();
+                  }}
+                  className="w-full h-full object-cover"
+                  poster="/video-thumb.jpg"
+                />
+              </SwiperSlide>
+            ))}
+          </Swiper>
         </div>
-        <div style={{marginTop: "10px",fontWeight: "600", fontFamily: "Roboto",fontStyle: "italic"}}>
-          Shop smart, Shop Easy.
+
+        {/* IMAGE SLIDER */}
+        <div className="rounded-2xl overflow-hidden shadow-lg bg-white p-4">
+          <Swiper
+            modules={[Pagination, Autoplay]}
+            slidesPerView={1}
+            pagination={{ clickable: true }}
+            autoplay={{ delay: 5000 }}
+            loop
+            className="h-full"
+          >
+            {[slideshow1, slideshow2, slideshow3, slideshow4, slideshow5].map(
+              (img, index) => (
+                <SwiperSlide key={index}>
+                  <img
+                    src={img}
+                    alt="testimonial"
+                    className="w-full max-h-[520px] object-contain mx-auto"
+                  />
+                </SwiperSlide>
+              )
+            )}
+          </Swiper>
         </div>
-     </div> */}
       </div>
-    </div>
+    </section>
   );
 };
 
