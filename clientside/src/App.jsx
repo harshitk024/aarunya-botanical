@@ -1,4 +1,5 @@
 import { Route, Routes } from "react-router-dom";
+import {Analytics} from '@vercel/analytics/react'
 import Home from "./pages/Home";
 import Doctors from "./pages/Doctors";
 import Login from "./pages/Login";
@@ -31,6 +32,7 @@ const App = () => {
 
   return (
     <div className="mx-4 sm:mx-[2%]">
+      <Analytics />
       <ToastContainer />
       <Navbar />
       <Routes>
