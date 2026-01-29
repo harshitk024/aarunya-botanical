@@ -15,6 +15,7 @@ import timeout from "connect-timeout"
 
 const app = express();
 
+app.set("trust proxy",1)
 app.use(cookieParser())
 app.use(timeout("10m"))
 app.use(cors({origin: "https://www.aarunyabotanicals.com",credentials: true}));
