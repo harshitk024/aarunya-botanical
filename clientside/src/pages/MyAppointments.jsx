@@ -1,10 +1,11 @@
 import { useContext, useEffect, useState } from "react";
 import { AppContext } from "../context/AppContext";
 import axios from "axios";
+import api from "../lib/axios";
 import { toast } from "react-toastify";
 import JoinMeetingButton from "../components/JoinMeetingButton";
 const MyAppointments = () => {
-  const { backendUrl, token, getDoctorsData } = useContext(AppContext);
+  const { backendUrl, getDoctorsData, user} = useContext(AppContext);
 
   const [appointments, setAppointments] = useState([]);
   const months = [
@@ -48,9 +49,7 @@ const MyAppointments = () => {
 
   const getUserAppointments = async () => {
     try {
-      const { data } = await axios.get(backendUrl + "/api/appointments", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const { data } = await api.get("/api/appointments");
 
       if (data.success) {
         setAppointments(data.appointments.reverse());
@@ -83,10 +82,10 @@ const MyAppointments = () => {
   };
 
   useEffect(() => {
-    if (token) {
+    if (user) {
       getUserAppointments();
     }
-  }, [token]);
+  }, [user]);
 
   return (
     <div>

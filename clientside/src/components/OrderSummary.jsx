@@ -1,21 +1,19 @@
 import { PlusIcon, SquarePenIcon, XIcon } from 'lucide-react';
 import React, { useEffect, useState } from 'react'
 import AddressModal from './AddressModal';
-import { useSelector } from 'react-redux';
 import {toast} from 'react-toastify';
 import { useNavigate } from 'react-router';
 import { useContext } from 'react';
 import { AppContext } from '../context/AppContext';
-import axios from 'axios';
-
+import api from '../lib/axios';
 const OrderSummary = ({ totalPrice, items }) => {
 
-    const {userData,backendUrl,token} = useContext(AppContext)
+    const {user} = useContext(AppContext)
 
     const currency = '₹';
 
     const navigate = useNavigate()
-    const addressList = userData?.address
+    const addressList = user?.address
 
 
     const [paymentMethod, setPaymentMethod] = useState('COD');
@@ -26,14 +24,14 @@ const OrderSummary = ({ totalPrice, items }) => {
 
     useEffect(() => {
 
-        if(addressList.line1 == ""){
+        if(addressList == ""){
             setSelectedAddress(false)
         }else{
             setSelectedAddress(addressList)
         }
     },[addressList])
 
-    if(!userData) return <div>Loading..</div>
+    if(!user) return <div>Loading..</div>
     
     const handleCouponCode = async (event) => {
         event.preventDefault();
@@ -44,9 +42,7 @@ const OrderSummary = ({ totalPrice, items }) => {
 
         try {
 
-        const {data} = await axios.post(backendUrl + `/api/products/place-order`,{},{
-            headers: {Authorization: `Bearer ${token}`}
-        })
+        const {data} = await api.post(`/api/products/place-order`,{})
 
         if(data.success){
             toast.success("Order placed Successfully")

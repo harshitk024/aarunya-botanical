@@ -1,4 +1,5 @@
-import { verifyToken } from "../utils/jwt";
+import { Request, Response, NextFunction } from "express";
+import { verifyAccessToken } from "../utils/jwt";
 
 export interface AuthRequest extends Request {
   user?: {
@@ -7,22 +8,24 @@ export interface AuthRequest extends Request {
   };
 }
 
-export const authMiddleware = (req: any, res: any, next:any) => {
-  const authHeader = req.headers.authorization;
+export const authMiddleware = (
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  const token = req.cookies?.accessToken;
+  console.log(req.cookies)
 
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return res.status(401).json({ message: "Unauthorized" });
+  if (!token) {
+    return res.status(401).json({ message: "Not authenticated" });
   }
 
   try {
-    const token = authHeader.split(" ")[1];
-    const decoded = verifyToken(token);
+    const decoded = verifyAccessToken(token);
+    req.user = decoded
 
-    console.log("User decoded:  ",decoded)
-
-    req.user = decoded;
     next();
-  } catch {
-    return res.status(401).json({ message: "Invalid token" });
+  } catch (err) {
+    return res.status(401).json({ message: "Invalid or expired token" });
   }
 };

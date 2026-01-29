@@ -1,136 +1,108 @@
 import { createContext, useEffect, useState } from "react";
-import axios from "axios";
+import api from "../lib/axios"
 import { toast } from "react-toastify";
 
-export const AppContext = createContext();
+export const AppContext = createContext(null);
 
 const AppContextProvider = (props) => {
+
   const currencySymbol = "₹";
-  const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
   const [doctors, setDoctors] = useState([]);
-  const [products,setProducts] = useState([]);
-  const [cartItems,setCartItems] = useState([]);
-  const [loading,setLoading] = useState(false)
-  const [address,setAddress] = useState({})
+  const [products, setProducts] = useState([]);
+  const [cartItems, setCartItems] = useState([]);
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  const [token, setToken] = useState(
-    localStorage.getItem("token") ? localStorage.getItem("token") : false
-  );
-  const [userData, setUserData] = useState(false);
+
+  const checkAuth = async () => {
+    try {
+      const { data } = await api.get("/api/auth/me");
+      setUser(data.user);
+    } catch(error) {
+      console.log(error)
+      setUser(null);
+    }
+  };
+
+
+  const logout = async () => {
+    await api.post("/api/auth/logout");
+    setUser(null);
+    setCartItems([]);
+  };
+
 
   const getDoctorsData = async () => {
     try {
-      const { data } = await axios.get(backendUrl + "/api/doctor/public");
-      if (data) {
-        setDoctors(data);
-        console.log(data)
-      } else {
-
-        toast.error(data.message);
-      }
-    } catch (error) {
-      console.log(error);
-      toast.error(error.message);
+      const { data } = await api.get("/api/doctor/public");
+      setDoctors(data);
+    } catch (err) {
+      toast.error(err.message);
     }
   };
 
   const getProductsData = async () => {
-
     try {
-      
-      const {data} = await axios.get(backendUrl + "/api/products")
-
-      if (data){
-        setProducts(data)
-        console.log(data)
-      } else {
-        toast.error("Error Fetching Products")
-      }
-
-    } catch (error) {
-      console.log(error)
-
-    }
-
-  }
-
-  const loadUserProfileData = async () => {
-    try {
-      const { data } = await axios.get(backendUrl + "/api/user/get-profile", {
-        headers: { 
-          Authorization: `Bearer ${token}`
-         },
-      });
-      if (data.success) {
-        setUserData(data.user);
-        // setAddress(data.user)
-        console.log(data)
-      } else {
-        toast.error(data.message);
-      }
-    } catch (error) {
-      console.log(error);
-      toast.error(error.message);
+      const { data } = await api.get("/api/products");
+      setProducts(data);
+    } catch {
+      toast.error("Error fetching products");
     }
   };
 
   const getCart = async () => {
     try {
-
-      const {data} = await axios.get(backendUrl + "/api/user/fetch-cart", {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      })
-
-      console.log(data)
-
-      if(data){
-        setCartItems(data.cartItems)
-      } else {
-        toast.error("Can't fetch cart")
-      }
-
-
-    } catch (error) {
-
-      console.log(error)
+      const { data } = await api.get("/api/user/fetch-cart");
+      setCartItems(data.cartItems);
+    } catch {
     }
-  }
-
-  const value = {
-    doctors,
-    products,
-    loading,
-    setLoading,
-    getDoctorsData,
-    getCart,
-    cartItems,
-    currencySymbol,
-    token,
-    setToken,
-    backendUrl,
-    userData,
-    setUserData,
-    loadUserProfileData,
   };
 
   useEffect(() => {
-    // getDoctorsData();
-    getProductsData();
+    const fetchProduct = async () => {
+      await getProductsData()
+    }
+    fetchProduct()
+  },[])
+
+  useEffect(() => {
+    const init = async () => {
+      await checkAuth();
+      setLoading(false);
+    };
+    init();
   }, []);
 
   useEffect(() => {
-    if (token) {
-      loadUserProfileData();
+    if (user) {
+      getCart(); 
     } else {
-      setUserData(false);
+      setCartItems([]);
     }
-  }, [token]);
+  }, [user]);
+
+  const value = {
+    user,
+    setUser,
+    logout,
+
+    doctors,
+    products,
+    cartItems,
+
+    currencySymbol,
+    loading,
+
+    getDoctorsData,
+    getProductsData,
+    getCart,
+  };
 
   return (
-    <AppContext.Provider value={value}>{props.children}</AppContext.Provider>
+    <AppContext.Provider value={value}>
+      {props.children}
+    </AppContext.Provider>
   );
 };
 

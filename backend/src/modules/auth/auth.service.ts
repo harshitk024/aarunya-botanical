@@ -24,6 +24,17 @@ type SafeUser = {
   role: Role;
   createdAt: Date;
 };
+export const saveRefreshToken = async (
+  userId: any,
+  refreshToken: any
+) => {
+  const hashedToken = await bcrypt.hash(refreshToken, 12);
+
+  await prisma.user.update({
+    where: { id: userId },
+    data: { refreshToken: hashedToken },
+  });
+};
 
 export const registerUser = async ({
   name,

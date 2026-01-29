@@ -1,29 +1,48 @@
 import jwt, { JwtPayload } from "jsonwebtoken";
-import "dotenv/config"
-// Shape of data stored in JWT
+import "dotenv/config";
+
 export interface JwtUserPayload {
-  userId: String;
+  userId: string;
   role: string;
 }
 
-// Ensure secret exists at runtime
-const JWT_SECRET = process.env.JWT_SECRET;
+const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET;
+const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET;
 
-if (!JWT_SECRET) {
-  throw new Error("JWT_SECRET is not defined in environment variables");
+if (!ACCESS_TOKEN_SECRET || !REFRESH_TOKEN_SECRET) {
+  throw new Error("JWT secrets are not defined in env variables");
 }
 
-export const signToken = (payload: JwtUserPayload): string => {
-  return jwt.sign(payload, JWT_SECRET, {
+
+
+export const signAccessToken = (payload: any): string => {
+  return jwt.sign(payload, ACCESS_TOKEN_SECRET, {
+    expiresIn: "15m",
+  });
+};
+
+export const signRefreshToken = (payload: any): string => {
+  return jwt.sign(payload, REFRESH_TOKEN_SECRET, {
     expiresIn: "7d",
   });
 };
 
-export const verifyToken = (token: string): JwtUserPayload => {
-  const decoded = jwt.verify(token, JWT_SECRET);
+
+export const verifyAccessToken = (token: string): JwtUserPayload => {
+  const decoded = jwt.verify(token, ACCESS_TOKEN_SECRET);
 
   if (typeof decoded === "string") {
-    throw new Error("Invalid token payload");
+    throw new Error("Invalid access token");
+  }
+
+  return decoded as JwtUserPayload;
+};
+
+export const verifyRefreshToken = (token: string): JwtUserPayload => {
+  const decoded = jwt.verify(token, REFRESH_TOKEN_SECRET);
+
+  if (typeof decoded === "string") {
+    throw new Error("Invalid refresh token");
   }
 
   return decoded as JwtUserPayload;

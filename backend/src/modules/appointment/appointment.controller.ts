@@ -9,52 +9,69 @@ const formatAmPm = (date: Date) =>
 
 
 export const bookAppointment = async (req: any, res: any) => {
-  const patientId = req.user.userId;
-  const {doctorId} = req.params
-  const {startTime, endTime } = req.body;
-  console.log("Doctor Id: ",doctorId)
+  const patientId = req.user.userId          // User.id
+  const doctorUserId = req.params.doctorId   // User.id
+  const { startTime, endTime } = req.body
 
-  const overlapping = await prisma.appointment.findFirst({
-    where: {
-      doctorId,
-      status: "SCHEDULED",
-      OR: [
-        { startTime: { lt: endTime, gte: startTime } },
-        { endTime: { gt: startTime, lte: endTime } },
-      ],
-    },
-  });
+  try {
+    const start = new Date(startTime)
+    const end = new Date(endTime)
 
-  if (overlapping) {
-    return res.status(400).json({ message: "Slot not available" });
+    const appointment = await prisma.$transaction(async (tx) => {
+
+      // 1️⃣ Resolve DoctorProfile FIRST
+      const doctorProfile = await tx.doctorProfile.findUnique({
+        where: { userId: doctorUserId },
+      })
+
+      if (!doctorProfile) {
+        throw new Error("Doctor not found")
+      }
+
+      const doctorProfileId = doctorProfile.id
+
+      // 2️⃣ Lock overlapping appointments (DoctorProfile.id)
+      const overlapping = await tx.$queryRaw<
+        { id: string }[]
+      >`
+        SELECT id FROM "Appointment"
+        WHERE "doctorId" = ${doctorProfileId}
+          AND status = 'SCHEDULED'
+          AND "startTime" < ${end}
+          AND "endTime" > ${start}
+        FOR UPDATE
+      `
+
+      if (overlapping.length > 0) {
+        throw new Error("Slot not available")
+      }
+
+      // 3️⃣ Create appointment
+      return await tx.appointment.create({
+        data: {
+          patientId,
+          doctorId: doctorProfileId, // ✅ DoctorProfile.id
+          startTime: start,
+          endTime: end,
+          amount: doctorProfile.fees,
+        },
+      })
+    })
+
+    return res.status(201).json({
+      success: true,
+      appointmentId: appointment.id,
+    })
+
+  } catch (err: any) {
+    return res.status(400).json({
+      success: false,
+      message: err.message,
+    })
   }
-
-  const doctor = await prisma.user.findUnique({
-    where: {id: doctorId},
-    include: {
-      doctorProfile: true
-    }
-  })
-
-  console.log(doctor)
-
-  if(!doctor || !doctor.doctorProfile){
-    throw new Error("Doctor not found")
-  }
+}
 
 
-  const appointment = await prisma.appointment.create({
-    data: {
-      patientId,
-      doctorId,
-      startTime: new Date(startTime),
-      endTime: new Date(endTime),
-      amount: doctor.doctorProfile.fees,
-    },
-  });
-
-  res.json(appointment);
-};
 
 export const getAvailableSlots = async (req: any, res: any) => {
   try {
@@ -89,7 +106,7 @@ export const getAvailableSlots = async (req: any, res: any) => {
       where: {
         doctorId_dayOfWeek: {
           doctorId: doctor.doctorProfile.id,
-          dayOfWeek,  
+          dayOfWeek,
         },
       },
     });
@@ -121,13 +138,21 @@ export const getAvailableSlots = async (req: any, res: any) => {
       });
     }
 
+    const dayStart = new Date(Date.UTC(
+      targetDate.getUTCFullYear(),
+      targetDate.getUTCMonth(),
+      targetDate.getUTCDate()
+    ));
+
+    const dayEnd = new Date(dayStart.getTime() + 86400000);
+
     const bookedSlots = await prisma.appointment.findMany({
       where: {
-        doctorId,
+        doctorId: doctor.doctorProfile.id,
         status: { not: "CANCELLED" },
         startTime: {
-          gte: new Date(targetDate.toDateString()),
-          lt: new Date(new Date(targetDate.toDateString()).getTime() + 86400000),
+          gte: dayStart,
+          lt: dayEnd
         },
       },
       select: {
@@ -183,7 +208,7 @@ export const getUserAppointments = async (req: any, res: any) => {
       include: {
         doctor: {
           include: {
-            doctorProfile: true,
+            user: true,
           },
         },
       },
@@ -206,10 +231,10 @@ export const getUserAppointments = async (req: any, res: any) => {
         cancelled: apt.status === "CANCELLED",
         isCompleted: apt.status === "COMPLETED",
         docData: {
-          name: apt.doctor.name,
-          speciality: apt.doctor.doctorProfile?.speciality ?? "",
-          image: apt.doctor.image,
-          address: apt.doctor.address,
+          name: apt.doctor.user.name,
+          speciality: apt.doctor.speciality,
+          image: apt.doctor.user.image,
+          address: apt.doctor.user.address,
         },
       };
     });

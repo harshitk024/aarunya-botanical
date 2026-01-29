@@ -1,21 +1,113 @@
-import React, { useContext, useState } from "react";
+import { useContext, useState } from "react";
 import { assets } from "../assets/assets";
 import { NavLink, useNavigate } from "react-router-dom";
 import { AppContext } from "../context/AppContext";
 import { ShoppingCart } from "lucide-react";
 import { useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
+import { clearCart } from "../lib/features/cart/cartSlice";
+
+// const Navbar = () => {
+//   const navigate = useNavigate();
+//   const { user, logout } = useContext(AppContext);
+
+//   const cartCount = useSelector(
+//     (state) => state.cart.cartItems.length
+//   );
+
+
+//   return (
+//     <div className="flex items-center justify-between text-sm p-6 mb-5 border-b border-b-gray-400">
+//       <img
+//         onClick={() => navigate("/")}
+//         className="cursor-pointer"
+//         src={assets.logo}
+//         height={150}
+//         width={150}
+//         alt=""
+//       />
+
+//       {/* Desktop Links */}
+//       <ul className="hidden md:flex items-start gap-5 font-medium">
+//         <NavLink to="/">HOME</NavLink>
+//         <NavLink to="/products">PRODUCTS</NavLink>
+//         <NavLink to="/about">ABOUT</NavLink>
+//         <NavLink to="/contact">CONTACT</NavLink>
+//       </ul>
+
+//       <div className="flex items-center gap-4">
+//         {/* Cart */}
+//         <NavLink
+//           to="/cart"
+//           className="relative flex items-center gap-2 text-slate-600"
+//         >
+//           <ShoppingCart size={20} />
+//           Cart
+//           <span className="absolute -top-1 left-3 text-[10px] text-white bg-slate-600 size-3.5 rounded-full flex items-center justify-center">
+//             {cartCount}
+//           </span>
+//         </NavLink>
+
+//         {/* Auth Section */}
+//         {user ? (
+//           <div className="flex items-center gap-2 cursor-pointer group relative">
+//             <img className="w-8 rounded-full" src={user.image} alt="" />
+//             <img className="w-2.5" src={assets.dropdown_icon} alt="" />
+//             <div className="absolute top-0 right-0 pt-14 text-base font-medium text-gray-600 z-20 hidden group-hover:block">
+//               <div className="min-w-48 bg-stone-100 rounded flex flex-col gap-4 p-4">
+//                 <p
+//                   onClick={() => navigate("/my-profile")}
+//                   className="hover:text-black cursor-pointer"
+//                 >
+//                   My Profile
+//                 </p>
+//                 <p
+//                   onClick={() => navigate("/my-appointments")}
+//                   className="hover:text-black cursor-pointer"
+//                 >
+//                   My Appointments
+//                 </p>
+//                                 <p
+//                   onClick={() => navigate("/orders")}
+//                   className="hover:text-black cursor-pointer"
+//                 >
+//                   My Orders
+//                 </p>
+//                 <p onClick={logout} className="hover:text-black cursor-pointer">
+//                   Logout
+//                 </p>
+//               </div>
+//             </div>
+//           </div>
+//         ) : (
+//           <button
+//             onClick={() => navigate("/login")}
+//             className="bg-primary text-white px-8 py-3 rounded-full hidden md:block"
+//           >
+//             Create account
+//           </button>
+//         )}
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default Navbar;
+
 const Navbar = () => {
   const navigate = useNavigate();
 
-  const { token, setToken, userData } = useContext(AppContext);
+  const { user,logout } = useContext(AppContext);
   const [showMenu, setShowMenu] = useState(false);
   const cartCount = useSelector(state => state.cart.cartItems).length
+  const dispatch = useDispatch()
 
+  const logOutUser = () => {
+    logout();
+    dispatch(clearCart())
+    navigate("/")
+  }
 
-  const logout = () => {
-    setToken(false);
-    localStorage.removeItem("token");
-  };
 
   return (
     <div className="flex items-center justify-between text-sm p-6 mb-5 border-b border-b-gray-400">
@@ -58,9 +150,9 @@ const Navbar = () => {
             </button>
           </NavLink>
         </ul>
-        {token && userData ? (
+        {user ? (
           <div className="flex items-center gap-2 cursor-pointer group relative">
-            <img className="w-8 rounded-full" src={userData.image} alt="" />
+            <img className="w-8 rounded-full" src={user.image} alt="" />
             <img className="w-2.5" src={assets.dropdown_icon} alt="" />
             <div className="absolute top-0 right-0 pt-14 text-base font-medium text-gray-600 z-20 hidden group-hover:block">
               <div className="min-w-48 bg-stone-100 rounded flex flex-col gap-4 p-4">
@@ -82,7 +174,7 @@ const Navbar = () => {
                 >
                   My Orders
                 </p>
-                <p onClick={logout} className="hover:text-black cursor-pointer">
+                <p onClick={logOutUser} className="hover:text-black cursor-pointer">
                   Logout
                 </p>
               </div>

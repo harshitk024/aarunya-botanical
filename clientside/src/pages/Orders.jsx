@@ -1,22 +1,14 @@
 import PageTitle from "../components/PageTitle";
 import { useEffect, useState } from "react";
 import OrderItem from "../components/OrderItem";
-import axios from "axios";
-import { AppContext } from "../context/AppContext";
-import { useContext } from "react";
-
+import api from "../lib/axios";
 export default function Orders() {
   const [orders, setOrders] = useState([]);
-
-  const { backendUrl, token } = useContext(AppContext);
-
 
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const { data } = await axios.get(backendUrl + "/api/user/orders", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const { data } = await api.get("/api/user/orders");
 
         if (data.success) {
           console.log(data)

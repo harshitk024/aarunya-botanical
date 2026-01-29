@@ -3,14 +3,11 @@ import { XIcon } from "lucide-react";
 import { useContext, useState } from "react";
 import { toast } from "react-toastify";
 import { useDispatch, useSelector } from "react-redux";
-import axios from "axios";
-import { AppContext } from "../context/AppContext";
-
+import api from "../lib/axios";
 
 const AddressModal = ({ setShowAddressModal, existingAddress, setSelectedAddress}) => {
 
   const dispatch = useDispatch();
-  const {backendUrl,token} = useContext(AppContext)
 
   const [address,setAddressState] = useState(existingAddress)
 
@@ -28,7 +25,7 @@ const AddressModal = ({ setShowAddressModal, existingAddress, setSelectedAddress
     e.preventDefault();
 
     try {
-      const res = await axios.put(backendUrl + `/api/user/save-address`, address, {headers: {Authorization: `Bearer ${token}`}});
+      const res = await api.put(`/api/user/save-address`, address);
 
       dispatch(setAddress(res.data.address));
       setSelectedAddress(res.data.address)

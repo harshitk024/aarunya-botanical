@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useContext, useState } from "react";
 import { AppContext } from "../context/AppContext";
-
+import api from "../lib/axios";
 
 const JoinMeetingButton = ({ appointmentId }) => {
 
@@ -11,17 +11,12 @@ const JoinMeetingButton = ({ appointmentId }) => {
 
   const [loading, setLoading] = useState(false);
 
-  const {token,backendUrl} = useContext(AppContext)
-
   const joinMeeting = async () => {
     try {
       setLoading(true);
 
-      const res = await axios.get( backendUrl + 
+      const res = await api.get( 
         `/api/meeting/${appointmentId}/join-meeting`,
-        {
-          headers: {Authorization: `Bearer ${token}`}
-        }
       );
 
       // Redirect user to Zoom

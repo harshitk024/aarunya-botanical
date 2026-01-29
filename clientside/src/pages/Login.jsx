@@ -1,11 +1,11 @@
 import { useContext, useEffect, useState } from "react";
 import { AppContext } from "../context/AppContext";
-import axios from "axios";
+import api from "../lib/axios";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 
 const Login = () => {
-  const { backendUrl, token, setToken } = useContext(AppContext);
+  const { user,setUser } = useContext(AppContext);
   const navigate = useNavigate();
 
   const [state, setState] = useState("Sign Up");
@@ -24,8 +24,8 @@ const Login = () => {
   try {
 
     if (state === "Sign Up") {
-      const { data } = await axios.post(
-        backendUrl + "/api/auth/register",
+      const { data } = await api.post(
+        "/api/auth/register",
         { name, email, password }
       );
 
@@ -34,21 +34,23 @@ const Login = () => {
       }
 
       toast.success(data.message || "Verification email sent");
-      localStorage.setItem("token", data.token);
-      setToken(data.token)
       navigate("/")
       setName("");
       setEmail("");
       setPassword("");
     } else {
-      const { data } = await axios.post(
-        backendUrl + "/api/auth/login",
+      await api.post(
+        "/api/auth/login",
         { email, password }
       );
 
-      localStorage.setItem("token", data.token);
-      setToken(data.token);
-      toast.success("Login successful");
+      const {data} = await api.get("/api/user/get-profile");
+
+      if(data){
+        setUser(data.user)
+        toast.success("Login successful");
+        navigate("/")
+      }
     }
   } catch (error) {
     console.log(error)
@@ -60,10 +62,10 @@ const Login = () => {
 
 
   useEffect(() => {
-    if (token) {
+    if (user) {
       navigate("/");
     }
-  }, [token]);
+  }, [user]);
 
   return (
     <form onSubmit={onSubmitHandler} className="min-h-[80vh] flex items-center">

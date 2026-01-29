@@ -14,7 +14,7 @@ import { AppContext } from "../context/AppContext";
 
 const ProductDetails = ({ product }) => {
   const productId = product.id;
-  const {token} = useContext(AppContext)
+  const {user} = useContext(AppContext)
   const currency = "₹";
 
   const dispatch = useDispatch();
@@ -29,7 +29,7 @@ const ProductDetails = ({ product }) => {
   const [mainImage, setMainImage] = useState(product.images[0].imageUrl);
 
   const addToCartHandler = () => {
-    if(!token){
+    if(!user){
       navigate("/login")
     } else {
       dispatch(addToCart({ productId }));

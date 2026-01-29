@@ -1,19 +1,13 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "../../../utils/axios";
-
+import api from "../../axios";
 // ADD TO CART
 export const addToCart = createAsyncThunk(
   "cart/addToCart",
   async ({ productId, quantity = 1 }, { rejectWithValue }) => {
     try {
-      const { data } = await axios.post(
+      const { data } = await api.post(
         "/api/products/add-cart",
         { productId, quantity },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
       );
       return data.cartResponse;
     } catch (err) {
@@ -27,14 +21,9 @@ export const decreaseQuantity = createAsyncThunk(
   "cart/decreaseQuantity",
   async ({ productId }, { rejectWithValue }) => {
     try {
-      const { data } = await axios.post(
+      const { data } = await api.post(
         "/api/products/decrease-cart",
         { productId },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
       );
       console.log(data)
       return data.cartResponse; 
@@ -50,11 +39,7 @@ export const deleteItemFromCart = createAsyncThunk(
   "cart/deleteItem",
   async ({ productId }, { rejectWithValue }) => {
     try {
-      await axios.post(`/api/products/delete-cart/${productId}`,{}, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
+      await api.post(`/api/products/delete-cart/${productId}`,{});
       return productId;
     } catch (err) {
       console.log(err)
@@ -68,12 +53,7 @@ export const fetchCart = createAsyncThunk(
   "cart/fetchCart",
   async (_, { rejectWithValue }) => {
     try {
-      const { data } = await axios.get("/api/user/fetch-cart", {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
-      console.log("FETCH CART: ",data)
+      const { data } = await api.get("/api/user/fetch-cart",);
       return data.cartItems; // array from backend
     } catch (err) {
       return rejectWithValue(err.response?.data?.message);

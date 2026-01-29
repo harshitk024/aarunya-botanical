@@ -2,13 +2,13 @@ import React, { useContext, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { AppContext } from "../context/AppContext";
 import { assets } from "../assets/assets";
-import RelatedDoctors from "../components/RelatedDoctors";
 import { toast } from "react-toastify";
 import axios from "axios";
+import api from "../lib/axios";
 
 const Appointment = () => {
   const { docId } = useParams();
-  const { currencySymbol, backendUrl, token } = useContext(AppContext);
+  const { currencySymbol,user } = useContext(AppContext);
 
   const daysOfWeek = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
   const navigate = useNavigate();
@@ -23,8 +23,8 @@ const Appointment = () => {
  useEffect(() => {
   const fetchDoctor = async () => {
     try {
-      const {data}  = await axios.get(
-        `${backendUrl}/api/doctor/id/${docId}`
+      const {data}  = await api.get(
+        `/api/doctor/id/${docId}`
       );
 
       if(data.success){
@@ -73,11 +73,7 @@ const Appointment = () => {
         const date = new Date(today)
         date.setDate(today.getDate() + i)
         const yyMmDd = date.toISOString().split("T")[0]
-
-        requests.push(axios.get(`${backendUrl}/api/appointments/${docId}/availability`,{
-          headers: {Authorization: `Bearer ${token}`},
-          params: {date: yyMmDd}
-        }))
+        requests.push(api.get(`/api/appointments/${docId}/availability`,{params: {date: yyMmDd}}))
       }
 
       console.time("weekly-slots")
@@ -234,9 +230,8 @@ const Appointment = () => {
     }
   }, [docInfo]);
 
-  /* -------------------- Book Appointment -------------------- */
   const bookAppointment = async () => {
-    if (!token) {
+    if (!user) {
       toast.warn("Login to book appointment");
       return navigate("/login");
     }
@@ -253,10 +248,9 @@ const Appointment = () => {
       const endTime = new Date(startTime);
       endTime.setMinutes(endTime.getMinutes() + 30);
 
-      const { data } = await axios.post(
-        `${backendUrl}/api/appointments/${docInfo.id}/book`,
+      const { data } = await api.post(
+        `/api/appointments/${docInfo.id}/book`,
         { startTime, endTime },
-        { headers: { Authorization: `Bearer ${token}` } }
       );
 
       if (data) {
