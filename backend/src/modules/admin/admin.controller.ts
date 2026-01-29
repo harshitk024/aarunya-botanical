@@ -167,7 +167,7 @@ export const getAllAppointments = async (_req: any, res: any) => {
   const appointments = await prisma.appointment.findMany({
     include: {
       patient: { select: { name: true, email: true, image: true } },
-      doctor: { select: { name: true, email: true, image: true } },
+      doctor: {include: {user: {select: {name: true,email: true,image: true}}}}
     },
     orderBy: { startTime: "desc" },
   });
@@ -204,11 +204,15 @@ export const getDashboardData = async (_req: any, res: any) => {
         orderBy: { createdAt: "desc" },
         include: {
           doctor: {
-            select: {
+            include :{
+            user: {
+              select: {
               name: true,
               image: true,
+              }
             },
           },
+        },
         },
       }),
     ]);
@@ -220,8 +224,8 @@ export const getDashboardData = async (_req: any, res: any) => {
       cancelled: appt.status === "CANCELLED",
       isCompleted: appt.status === "COMPLETED",
       docData: {
-        name: appt.doctor.name,
-        image: appt.doctor.image,
+        name: appt.doctor.user.name,
+        image: appt.doctor.user.image,
       },
     }));
 
