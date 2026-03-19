@@ -51,5 +51,22 @@ The platform focuses on simplicity, accessibility, and a clean user experience.
 
 ---
 
+## ⚙️ Installation & Setup
+
+### 1️⃣ Clone the Repository
+```bash
+git clone https://github.com/your-username/aarunya-botanicals.git
+cd aarunya-botanicals
+
+cd backend
+npm install
+npm start
+
+cd frontend
+npm install
+npm run dev
+
+---
+
 
 
