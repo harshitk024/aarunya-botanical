@@ -23,7 +23,7 @@ export default function Cart() {
     const [totalPrice, setTotalPrice] = useState(0);
 
     const createCartArray = () => {
-  let total = 0;
+    let total = 0;
 
   const cartArray = cartItems
     .map((cartItem) => {

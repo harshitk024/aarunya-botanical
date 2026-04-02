@@ -54,7 +54,7 @@ export const fetchCart = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const { data } = await api.get("/api/user/fetch-cart",);
-      return data.cartItems; // array from backend
+      return data.cartItems;
     } catch (err) {
       return rejectWithValue(err.response?.data?.message);
     }

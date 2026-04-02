@@ -177,18 +177,32 @@ enum PaymentMode {
   ONLINE
 }
 
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILED
+}
+
 model Order {
-  id        String @id @default(uuid())
-  userId    String
-  total Int
-  status    OrderStatus @default(PENDING)
+  id                String       @id @default(uuid())
+  userId            String
+  user              User         @relation(fields: [userId], references: [id])
 
-  createdAt  DateTime @default(now())
-  paymentMode PaymentMode @default(COD)
+  total             Int
+  status            OrderStatus  @default(PENDING)
 
-  user  User @relation(fields: [userId], references: [id])
-  items OrderItem[]
-  statusLogs OrderStatusLog[]
+  paymentMode       PaymentMode?
+
+  paymentStatus     PaymentStatus @default(PENDING)
+
+  razorpayOrderId   String?   @unique
+  razorpayPaymentId String?
+  razorpaySignature String?
+
+  createdAt         DateTime  @default(now())
+
+  orderItems        OrderItem[]
+  orderStatusLogs   OrderStatusLog[]
 }
 
 model OrderStatusLog {

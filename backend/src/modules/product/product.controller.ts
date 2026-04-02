@@ -1,8 +1,9 @@
 import { Request, Response } from "express";
 import prisma from "../../config/prisma";
 import cloudinary from "../../config/cloudinary";
-import fs from "fs"
 import streamifier from "streamifier"
+import {razorpay} from "../../utils/razorpay"
+import crypto from "crypto"
 
 export const createProduct = async (req: Request, res: Response) => {
   try {
@@ -348,7 +349,6 @@ export const placeOrder = async (req: any, res: any) => {
       total += item.product.price * item.quantity;
     }
 
-    // 3. Transaction: Order + OrderItems + Stock update + Clear cart
     const order = await prisma.$transaction(async (tx) => {
       // Create order
       const newOrder = await tx.order.create({
@@ -410,3 +410,126 @@ export const placeOrder = async (req: any, res: any) => {
 };
 
 
+export const createOrder = async (req:any,res:any) => {
+
+  const userId = req.user.userId
+  console.log("UserId:  ",userId)
+
+  const cartItems = await prisma.cartItem.findMany({
+    where:{userId},
+    include:{product:true}
+  })
+
+  console.log("Inside createOrder")
+
+  if(cartItems.length === 0){
+    return res.status(400).json({message:"Cart empty"})
+  }
+
+  let total = 0
+
+  for(const item of cartItems){
+
+    if(item.product.stock < item.quantity){
+      return res.status(400).json({
+        message:`Insufficient stock for ${item.product.name}`
+      })
+    }
+
+    total += item.product.price * item.quantity
+  }
+
+  // create razorpay order
+  console.log("Creating razorpay order")
+  const razorpayOrder = await razorpay.orders.create({
+    amount: total * 100,
+    currency: "INR"
+  })
+
+  // create order in DB
+  console.log("creating order")
+  const order = await prisma.order.create({
+    data:{
+      userId,
+      total,
+      status:"PENDING",
+      razorpayOrderId: razorpayOrder.id
+    }
+  })
+
+
+  console.log("code completed")
+
+  res.json({
+    orderId: order.id,
+    razorpayOrderId: razorpayOrder.id,
+    amount: total
+  })
+
+  console.log("JSON Sent")
+}
+
+
+export const verifyPayment = async (req:any,res:any)=>{
+
+  const {orderId,razorpay_payment_id,razorpay_signature} = req.body
+  const userId = req.user.userId
+
+  const order = await prisma.order.findUnique({
+    where:{id:orderId}
+  })
+
+  const sign = order?.razorpayOrderId + "|" + razorpay_payment_id
+
+  const expectedSign = crypto
+    .createHmac("sha256", process.env.RAZORPAY_SECRET_KEY!)
+    .update(sign)
+    .digest("hex")
+
+  if(expectedSign !== razorpay_signature){
+    return res.status(400).json({message:"Payment verification failed"})
+  }
+
+  const cartItems = await prisma.cartItem.findMany({
+    where:{userId},
+    include:{product:true}
+  })
+
+  await prisma.$transaction(async(tx)=>{
+
+    await tx.order.update({
+      where:{id:orderId},
+      data:{
+        paymentStatus:"SUCCESS",
+        status: "CONFIRMED",
+        razorpayPaymentId: razorpay_payment_id
+      }
+    })
+
+    for(const item of cartItems){
+
+      await tx.orderItem.create({
+        data:{
+          orderId,
+          productId:item.productId,
+          quantity:item.quantity,
+          priceCents:item.product.price
+        }
+      })
+
+      await tx.product.update({
+        where:{id:item.productId},
+        data:{
+          stock:{decrement:item.quantity}
+        }
+      })
+    }
+
+    await tx.cartItem.deleteMany({
+      where:{userId}
+    })
+
+  })
+
+  res.json({success:true})
+}

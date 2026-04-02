@@ -14,7 +14,6 @@ export const authMiddleware = (
   next: NextFunction
 ) => {
   const token = req.cookies?.accessToken;
-  console.log(req.cookies)
 
   if (!token) {
     return res.status(401).json({ message: "Not authenticated" });
