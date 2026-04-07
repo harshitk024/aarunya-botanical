@@ -18,7 +18,7 @@ const app = express();
 app.set("trust proxy",1)
 app.use(cookieParser())
 app.use(timeout("10m"))
-app.use(cors({origin: "http://localhost:5173",credentials: true}));
+app.use(cors({origin: "https://www.aarunyabotanicals.com",credentials: true}));
 app.use(express.json());
 
 app.use("/api/auth", authRoutes);
