@@ -410,64 +410,78 @@ export const placeOrder = async (req: any, res: any) => {
 };
 
 
-export const createOrder = async (req:any,res:any) => {
+export const createOrder = async (req: any, res: any) => {
+  try {
+    const userId = req.user.userId;
+    console.log("UserId:", userId);
 
-  const userId = req.user.userId
-  console.log("UserId:  ",userId)
+    const cartItems = await prisma.cartItem.findMany({
+      where: { userId },
+      include: { product: true }
+    });
 
-  const cartItems = await prisma.cartItem.findMany({
-    where:{userId},
-    include:{product:true}
-  })
+    console.log("Inside createOrder");
 
-  console.log("Inside createOrder")
-
-  if(cartItems.length === 0){
-    return res.status(400).json({message:"Cart empty"})
-  }
-
-  let total = 0
-
-  for(const item of cartItems){
-
-    if(item.product.stock < item.quantity){
-      return res.status(400).json({
-        message:`Insufficient stock for ${item.product.name}`
-      })
+    if (cartItems.length === 0) {
+      return res.status(400).json({ message: "Cart empty" });
     }
 
-    total += item.product.price * item.quantity
-  }
+    let total = 0;
 
-  // create razorpay order
-  console.log("Creating razorpay order")
-  const razorpayOrder = await razorpay.orders.create({
-    amount: total * 100,
-    currency: "INR"
-  })
+    for (const item of cartItems) {
+      if (item.product.stock < item.quantity) {
+        return res.status(400).json({
+          message: `Insufficient stock for ${item.product.name}`
+        });
+      }
 
-  // create order in DB
-  console.log("creating order")
-  const order = await prisma.order.create({
-    data:{
-      userId,
-      total,
-      status:"PENDING",
-      razorpayOrderId: razorpayOrder.id
+      total += item.product.price * item.quantity;
     }
-  })
 
+    console.log("Creating razorpay order");
 
-  console.log("code completed")
+    const razorpayOrder = await razorpay.orders.create({
+      amount: total * 100,
+      currency: "INR"
+    });
 
-  res.json({
-    orderId: order.id,
-    razorpayOrderId: razorpayOrder.id,
-    amount: total
-  })
+    console.log("Razorpay Order Created:", razorpayOrder);
 
-  console.log("JSON Sent")
-}
+    console.log("Creating order in DB");
+
+    const order = await prisma.order.create({
+      data: {
+        userId,
+        total,
+        status: "PENDING",
+        razorpayOrderId: razorpayOrder.id
+      }
+    });
+
+    console.log("Order saved in DB:", order);
+
+    res.json({
+      orderId: order.id,
+      razorpayOrderId: razorpayOrder.id,
+      amount: total
+    });
+
+    console.log("Response sent");
+
+  } catch (err: any) {
+    console.error("❌ CREATE ORDER ERROR");
+
+    // Detailed logs (VERY IMPORTANT)
+    console.error("Message:", err?.message);
+    console.error("Stack:", err?.stack);
+    console.error("Full Error:", JSON.stringify(err, null, 2));
+
+    return res.status(500).json({
+      message: "Something went wrong while creating order",
+      error: err?.message || "Unknown error"
+    });
+  }
+};
 
 
 export const verifyPayment = async (req:any,res:any)=>{
