@@ -19,7 +19,7 @@ app.set("trust proxy",1)
 app.use(cookieParser())
 app.use(timeout("10m"))
 
-app.use(cors({origin: process.env.CLIENT_ORIGIN,credentials: true}));
+app.use(cors({origin: "https://aarunyabotanicals.com",credentials: true}));
 app.use(express.json());
 
 app.use("/api/auth", authRoutes);
