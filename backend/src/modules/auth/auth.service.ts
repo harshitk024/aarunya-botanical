@@ -77,7 +77,7 @@ export const registerUser = async ({
     },
   });
 
-  sendVerificationEmail(email, verificationToken);
+  // sendVerificationEmail(email, verificationToken);
 
   return user;
 };
