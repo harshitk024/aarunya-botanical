@@ -254,14 +254,14 @@ export const getAllOrders = async (req: any, res: any) => {
         createdAt: "desc",
       },
       include: {
-        items: {
+        orderItems: {
           include: {
             product: {
               include: {
-                images: true,
-              },
-            },
-          },
+                images: true
+              }
+            }
+          }
         },
         user: true
       },
