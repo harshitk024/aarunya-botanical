@@ -231,39 +231,78 @@ const Appointment = () => {
   }, [docInfo]);
 
   const bookAppointment = async () => {
-    if (!user) {
-      toast.warn("Login to book appointment");
-      return navigate("/login");
-    }
 
-    if (!slotTime) {
-      toast.warn("Please select a time slot");
-      return;
-    }
+  if (!user) {
+    toast.warn("Login to book appointment");
+    return navigate("/login");
+  }
 
-    try {
-      const selectedSlot = docSlots[slotIndex].find((s) => s.time === slotTime);
+  if (!slotTime) {
+    toast.warn("Please select a time slot");
+    return;
+  }
 
-      const startTime = selectedSlot.datetime;
-      const endTime = new Date(startTime);
-      endTime.setMinutes(endTime.getMinutes() + 30);
+  try {
+    const selectedSlot = docSlots[slotIndex].find((s) => s.time === slotTime);
 
-      const { data } = await api.post(
-        `/api/appointments/${docInfo.id}/book`,
-        { startTime, endTime },
-      );
+    const startTime = selectedSlot.datetime;
+    const endTime = new Date(startTime);
+    endTime.setMinutes(endTime.getMinutes() + 30);
 
-      if (data) {
-        toast.success("Appointment Scheduled");
-        navigate("/my-appointments");
-      } else {
-        toast.error(data.message);
+    // 🔥 STEP 1: Create appointment order
+    const res = await api.post(
+      `/api/appointments/${docInfo.id}/create-order`,
+      { startTime, endTime }
+    );
+
+    const { appointmentId, razorpayOrderId } = res.data;
+
+    // 🔥 STEP 2: Open Razorpay
+    const options = {
+      key: import.meta.env.VITE_RAZORPAY_KEY,
+      order_id: razorpayOrderId,
+
+      handler: async function (response) {
+
+        try {
+          // 🔥 STEP 3: Verify payment
+          await api.post("/api/appointments/verify-payment", {
+            appointmentId,
+            razorpay_payment_id: response.razorpay_payment_id,
+            razorpay_signature: response.razorpay_signature,
+          });
+
+          toast.success("Appointment Confirmed");
+
+          // 🔥 STEP 4: Redirect
+          navigate("/my-appointments");
+
+        } catch (err) {
+          toast.error("Payment verification failed");
+        }
+      },
+
+      modal: {
+        ondismiss: () => {
+          toast.error("Payment cancelled");
+        }
       }
-    } catch (error) {
-      console.log(error)
-      toast.error("Booking failed");
-    }
-  };
+    };
+
+    const rzp = new window.Razorpay(options);
+
+    rzp.on("payment.failed", async () => {
+      await api.post("/api/payment-failed", { appointmentId });
+      toast.error("Payment failed");
+    });
+
+    rzp.open();
+
+  } catch (error) {
+    console.log(error);
+    toast.error("Booking failed");
+  }
+};
 
   if (!docInfo) return null;
 

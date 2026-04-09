@@ -1,4 +1,6 @@
 import prisma from "../../config/prisma";
+import { razorpay } from "../../utils/razorpay";
+import crypto from "crypto"
 
 const formatAmPm = (date: Date) =>
   date.toLocaleTimeString("en-IN", {
@@ -70,8 +72,153 @@ export const bookAppointment = async (req: any, res: any) => {
     })
   }
 }
+export const createAppointmentOrder = async (req: any, res: any) => {
+  const patientId = req.user.userId;
+  const doctorUserId = req.params.doctorId;
+  const { startTime, endTime } = req.body;
 
+  try {
+    const start = new Date(startTime);
+    const end = new Date(endTime);
 
+    // 1️⃣ Get doctor
+    const doctorProfile = await prisma.doctorProfile.findUnique({
+      where: { userId: doctorUserId },
+    });
+
+    if (!doctorProfile) {
+      return res.status(404).json({
+        success: false,
+        message: "Doctor not found",
+      });
+    }
+
+    // 🔥 OPTIONAL BUT SMART: check if already booked BEFORE payment
+    const existing = await prisma.appointment.findFirst({
+      where: {
+        doctorId: doctorProfile.id,
+        status: "SCHEDULED",
+        startTime: { lt: end },
+        endTime: { gt: start },
+      },
+    });
+
+    if (existing) {
+      return res.status(400).json({
+        success: false,
+        message: "Slot already booked",
+      });
+    }
+
+    // 2️⃣ Create Razorpay order
+    const razorpayOrder = await razorpay.orders.create({
+      amount: doctorProfile.fees * 100,
+      currency: "INR",
+    });
+
+    // 3️⃣ Create PENDING appointment
+    const appointment = await prisma.appointment.create({
+      data: {
+        patientId,
+        doctorId: doctorProfile.id,
+        startTime: start,
+        endTime: end,
+        amount: doctorProfile.fees,
+        paymentDone: false,
+        status: "PENDING", // 🔥 IMPORTANT
+        razorpayOrderId: razorpayOrder.id,
+      },
+    });
+
+    return res.json({
+      success: true,
+      appointmentId: appointment.id,
+      razorpayOrderId: razorpayOrder.id,
+      amount: doctorProfile.fees,
+    });
+
+  } catch (err: any) {
+    return res.status(400).json({
+      success: false,
+      message: err.message,
+    });
+  }
+};
+
+export const verifyAppointmentPayment = async (req: any, res: any) => {
+  try {
+    const {
+      appointmentId,
+      razorpay_payment_id,
+      razorpay_signature,
+    } = req.body;
+
+    const appointment = await prisma.appointment.findUnique({
+      where: { id: appointmentId },
+    });
+
+    if (!appointment) {
+      return res.status(404).json({
+        success: false,
+        message: "Appointment not found",
+      });
+    }
+
+    // 🔐 Verify signature
+    const body = `${appointment.razorpayOrderId}|${razorpay_payment_id}`;
+
+    const expectedSignature = crypto
+      .createHmac("sha256", process.env.RAZORPAY_SECRET_KEY!)
+      .update(body)
+      .digest("hex");
+
+    if (expectedSignature !== razorpay_signature) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid payment",
+      });
+    }
+
+    const start = appointment.startTime;
+    const end = appointment.endTime;
+
+    // 🔥 FINAL SLOT LOCK (CRITICAL)
+    await prisma.$transaction(async (tx) => {
+      const overlapping = await tx.$queryRaw<{ id: string }[]>`
+        SELECT id FROM "Appointment"
+        WHERE "doctorId" = ${appointment.doctorId}
+          AND id != ${appointmentId} -- 🔥 VERY IMPORTANT
+          AND status = 'SCHEDULED'
+          AND "startTime" < ${end}
+          AND "endTime" > ${start}
+        FOR UPDATE
+      `;
+
+      if (overlapping.length > 0) {
+        throw new Error("Slot already booked");
+      }
+
+      // ✅ Confirm appointment
+      await tx.appointment.update({
+        where: { id: appointmentId },
+        data: {
+          paymentDone: true,
+          status: "SCHEDULED",
+          razorpayPaymentId: razorpay_payment_id,
+          razorpaySignature: razorpay_signature,
+        },
+      });
+    });
+
+    return res.json({ success: true });
+
+  } catch (err: any) {
+    return res.status(400).json({
+      success: false,
+      message: err.message,
+    });
+  }
+};
 
 export const getAvailableSlots = async (req: any, res: any) => {
   try {
