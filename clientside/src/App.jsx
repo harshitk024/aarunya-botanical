@@ -43,7 +43,7 @@ const Layout = () => {
 
 const App = () => {
   const dispatch = useDispatch();
-  const { user, loading } = useContext(AppContext);
+  const { user } = useContext(AppContext);
 
   /* 🔹 Fetch cart when user logs in */
   useEffect(() => {

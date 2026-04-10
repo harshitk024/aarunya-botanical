@@ -6,7 +6,7 @@ import {
   CreditCardIcon,
   UserIcon,
 } from "lucide-react";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import { useNavigate } from "react-router";
 import Counter from "./Counter";
 import { useDispatch, useSelector } from "react-redux";
@@ -118,22 +118,25 @@ const ProductDetails = ({ product }) => {
           </button>
         </div>
 
-        <hr className="border-gray-300 my-5" />
+       <hr className="border-gray-300 my-5" />
 
-        <div className="flex flex-col gap-4 text-slate-500">
-          <p className="flex gap-3">
-            <EarthIcon className="text-slate-400" />
-            shipping worldwide
-          </p>
-          <p className="flex gap-3">
-            <CreditCardIcon className="text-slate-400" />
-            100% Secured Payment
-          </p>
-          <p className="flex gap-3">
-            <UserIcon className="text-slate-400" />
-            Trusted by top brands
-          </p>
-        </div>
+<div className="flex flex-col gap-4 text-slate-700">
+  <h2 className="text-xl font-semibold flex items-center gap-2">
+    🌿 {product.description?.title || "About This Product"}
+  </h2>
+
+  <ul className="list-disc pl-5 space-y-2 text-slate-600 text-sm">
+    {product.description?.points?.map((point, index) => (
+      <li key={index}>{point}</li>
+    ))}
+  </ul>
+
+  <div className="text-sm text-slate-600 mt-2 space-y-1">
+    {product.description?.footer?.map((line, index) => (
+      <p key={index}>{line}</p>
+    ))}
+  </div>
+</div>
       </div>
     </div>
   );

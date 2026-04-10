@@ -23,7 +23,7 @@ api.interceptors.response.use(
 
     if (
       error.response?.status === 401 &&
-      !originalRequest._retry
+      !originalRequest._retry && !originalRequest.url.includes("/api/auth/login")
     ) {
       originalRequest._retry = true;
 

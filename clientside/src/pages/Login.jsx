@@ -56,8 +56,15 @@ const Login = () => {
     }
   } catch (error) {
     console.log(error)
-    toast.error(error.response?.data?.message || "Something went wrong");
-  } finally {
+
+    if(error.response){
+      if(error.response.status === 401){
+        console.log("Error")
+        toast.error("Invalid email or password")
+      } else {
+        toast.error(error.response?.data?.message || "Something went wrong");
+      }
+    }
     setLoading(false)
   }
 };
